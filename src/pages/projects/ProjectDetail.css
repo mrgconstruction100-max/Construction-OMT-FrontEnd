@@ -1,0 +1,53 @@
+.kanban-wrapper {
+  position: relative;
+  overflow: auto;
+  height: 80vh;
+}
+
+.kanban-scroll-container {
+ width: 80vw;
+  max-width: 100vw; 
+  height: 80vh; /* or full height */
+  padding-bottom: 1rem;
+  margin-left: -24px;
+  margin-right: -24px;
+  height:100vh;
+   
+}
+
+.kanban-columns {
+  display: flex;
+  gap: 1rem;
+  min-width: max-content;
+  min-height: max-content;
+  flex-wrap: nowrap;
+  padding-bottom: 0.5rem;
+  padding-left: 24px;
+  padding-right: 24px;
+ 
+}
+
+.kanban-columns > div {
+  min-width: 300px;
+  max-width: 350px;
+  flex: 0 0 auto;
+}
+
+@media (max-width: 768px) {
+  .kanban-scroll-container {
+    padding-bottom: 0.5rem;
+    margin-left: -12px;
+    margin-right: -12px;
+    width:90vw;
+  }
+  .kanban-columns {
+    gap: 0.5rem;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  .kanban-columns > div {
+    min-width: 240px;
+    max-width: 90vw;
+  }
+} 
+

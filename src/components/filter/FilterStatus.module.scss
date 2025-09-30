@@ -1,0 +1,144 @@
+
+.filterStatus {
+  background-color: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+   padding: 12px;
+   margin: 10px 0;
+  // position: fixed;
+  // top: 120px;
+  // left: 50%;
+  //  transform: translateX();
+  // z-index: 100;
+   width: 100%;
+  // max-width: 1200px;
+   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  //  border-left: 4px solid #28a745;
+  // // Different background colors based on page context
+  // &[data-page-type="subtasks"] {
+  //   border-left: 4px solid #28a745;
+  // }
+  
+  // &[data-page-type="members"] {
+  //   border-left: 4px solid #007bff;
+  // }
+  
+  // &[data-page-type="projects"] {
+  //   border-left: 4px solid #6f42c1;
+  // }
+}
+
+.filterStatusHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-weight: 600;
+  span{
+    color:linear-gradient(135deg,217 91% 38%, 217 91% 28%);
+    font-weight: bold;
+  }
+
+
+}
+
+.clearAllButton {
+  background: none;
+  border: none;
+  color: #003cff;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  
+  &:hover {
+    color: #495057;
+    background-color: #e9ecef;
+  }
+}
+
+.filterTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filterTag {
+  display: flex;
+  align-items: center;
+  background-color: #76dbf5;
+  border-radius: 16px;
+  padding: 4px 8px;
+  font-size: 12px;
+  
+  // Different colors based on filter type
+  &[data-filter-type="priority"] {
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+  }
+  
+  &[data-filter-type="status"] {
+    background-color: #d1ecf1;
+    border: 1px solid #bee5eb;
+  }
+  
+  &[data-filter-type="date"] {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+  }
+}
+
+.filterLabel {
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.filterValue {
+  margin-right: 4px;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.clearFilterButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #6c757d;
+  padding: 0;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  
+  &:hover {
+    color: #495057;
+    background-color: #dee2e6;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .filterStatus {
+    top: 100px;
+    width: 95%;
+    padding: 8px;
+  }
+  
+  .filterTags {
+    gap: 6px;
+  }
+  
+  .filterTag {
+    font-size: 11px;
+    padding: 3px 6px;
+  }
+  
+  .filterValue {
+    max-width: 120px;
+  }
+}

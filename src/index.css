@@ -1,0 +1,136 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Construction Project Manager Design System
+All colors, gradients, fonts, etc are defined here. All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Construction theme colors */
+    --background: 218 20% 98%;
+    --foreground: 217 19% 13%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 217 19% 13%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 217 19% 13%;
+
+    /* Construction blue primary */
+    --primary: 217 91% 38%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 217 89% 85%;
+    --primary-dark: 217 91% 28%;
+
+    /* Safety orange secondary */
+    --secondary: 21 90% 48%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-light: 21 90% 85%;
+
+    /* Construction grays */
+    --muted: 217 15% 96%;
+    --muted-foreground: 217 13% 45%;
+
+    --accent: 217 15% 94%;
+    --accent-foreground: 217 19% 13%;
+
+    /* Status colors */
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 217 15% 90%;
+    --input: 217 15% 95%;
+    --ring: 217 91% 38%;
+
+    --radius: 0.75rem;
+
+    /* Sidebar colors */
+    --sidebar-background: 217 25% 15%;
+    --sidebar-foreground: 217 15% 85%;
+    --sidebar-primary: 217 91% 38%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 21 90% 48%;
+  --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 217 25% 25%;
+    --sidebar-ring: 217 91% 38%;
+
+    /* Construction gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-dark)));
+    --gradient-secondary: linear-gradient(135deg, hsl(var(--secondary)), hsl(var(--warning)));
+    --gradient-surface: linear-gradient(135deg, hsl(var(--card)), hsl(var(--muted)));
+
+    /* Professional shadows */
+    --shadow-construction: 0 4px 12px hsl(var(--primary) / 0.15);
+    --shadow-elevated: 0 8px 25px hsl(217 19% 13% / 0.1);
+    --shadow-soft: 0 2px 8px hsl(217 19% 13% / 0.05);
+
+    /* Smooth transitions */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    /* Toggle */
+        --toggle-bg: #f8f9fc;
+      --toggle-border: #ccc;
+      --icon-color: #4a4a4a;
+      --active-icon: #fff;
+  }
+
+  .dark {
+    --background: 217 25% 8%;
+    --foreground: 217 15% 92%;
+
+    --card: 217 25% 12%;
+    --card-foreground: 217 15% 92%;
+
+    --popover: 217 25% 12%;
+    --popover-foreground: 217 15% 92%;
+
+    --primary: 217 91% 55%;
+    --primary-foreground: 217 25% 8%;
+    --primary-light: 217 89% 70%;
+    --primary-dark: 217 91% 35%;
+
+    --secondary: 21 90% 55%;
+    --secondary-foreground: 217 25% 8%;
+    --secondary-light: 21 90% 75%;
+
+    --muted: 217 25% 15%;
+    --muted-foreground: 217 13% 65%;
+
+    --accent: 217 25% 18%;
+    --accent-foreground: 217 15% 92%;
+
+    --success: 142 71% 55%;
+    --warning: 38 92% 60%;
+    --destructive: 0 84% 65%;
+
+    --border: 217 25% 20%;
+    --input: 217 25% 15%;
+    --ring: 217 91% 55%;
+
+    --sidebar-background: 217 30% 5%;
+    --sidebar-foreground: 217 15% 85%;
+    --sidebar-primary: 217 91% 55%;
+    --sidebar-primary-foreground: 217 25% 8%;
+    --sidebar-accent: 217 25% 10%;
+    --sidebar-accent-foreground: 217 15% 85%;
+    --sidebar-border: 217 25% 15%;
+    --sidebar-ring: 217 91% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}

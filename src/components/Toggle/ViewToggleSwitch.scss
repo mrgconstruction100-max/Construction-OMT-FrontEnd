@@ -1,0 +1,36 @@
+.view-toggle-switch {
+  display: flex;
+  border: 1px solid var(--toggle-border);
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: var(--toggle-bg);
+
+  button {
+    padding: 10px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 35px;
+    height: 35px;
+
+    span.material-icons {
+      font-size: 20px;
+      color: var(--icon-color);
+    }
+
+    &.active {
+      background-image: var(--gradient-primary);
+      &:hover {
+        opacity: 90;
+      }
+      transition: var(--transition-smooth);
+      box-shadow: var(--shadow-construction);
+      span.material-icons {
+        color: var(--active-icon);
+      }
+    }
+  }
+}

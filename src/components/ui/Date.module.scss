@@ -1,0 +1,30 @@
+// .datePicker {
+//   display: flex;
+//   flex-direction: column;
+//   gap: 6px;
+// }
+
+.inputRoot {
+  border-radius: 10px !important;
+  background: transparent;
+  color: hsl(var(--foreground));
+}
+
+.notchedOutline {
+  border-color:hsl(var(--foreground));
+}
+
+.inputRoot:hover .notchedOutline {
+ border-color: hsl(var(--primary) / 0.5);
+}
+
+.inputRoot.Mui-focused .notchedOutline {
+  border-color: #2563eb !important;
+  border-width: 2px !important;
+}
+
+.errorText {
+  color: #dc2626;
+  font-size: 0.875rem;
+  margin-top: 4px;
+}

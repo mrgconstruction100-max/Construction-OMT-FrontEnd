@@ -1,0 +1,146 @@
+// FormInput.module.scss - Using direct CSS with your design system variables
+
+.formInput {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: hsl(var(--foreground));
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.required {
+  color: hsl(var(--destructive));
+  font-size: 1.2em;
+  line-height: 1;
+}
+
+.inputWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: hsl(var(--muted-foreground));
+  z-index: 10;
+  
+  svg {
+    width: 1rem;
+    height: 1rem;
+  }
+}
+
+.input {
+  width: 75%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.75rem;
+  background-color: hsl(var(--input));
+  color: hsl(var(--foreground));
+  font-family: inherit;
+  font-size: 1rem;
+  min-height: 2.5rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  &::placeholder {
+    color: hsl(var(--muted-foreground));
+  }
+  
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px hsl(var(--ring)), 0 4px 12px hsl(var(--primary) / 0.15);
+    border-color: transparent;
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  &.withIcon {
+    padding-left: 2.5rem;
+  }
+  
+  &.error {
+    border-color: hsl(var(--destructive));
+    background-color: hsl(var(--destructive) / 0.05);
+    
+    &:focus {
+      box-shadow: 0 0 0 2px hsl(var(--destructive)), 0 4px 12px hsl(var(--primary) / 0.15);
+    }
+  }
+  
+  &:not(.error):hover {
+    border-color: hsl(var(--primary) / 0.5);
+    box-shadow: 0 2px 8px hsl(217 19% 13% / 0.05);
+  }
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 6rem;
+  line-height: 1.5;
+}
+
+.errorText {
+  display: block;
+  font-size: 0.875rem;
+  color: hsl(var(--destructive));
+  margin-top: 0.25rem;
+  animation: slideIn 0.2s ease-out;
+}
+
+/* Custom scrollbar for textarea */
+.textarea {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--muted-foreground) / 0.3) transparent;
+  
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.3);
+    border-radius: 3px;
+    
+    &:hover {
+      background: hsl(var(--muted-foreground) / 0.5);
+    }
+  }
+}
+
+/* Animation for error messages */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .input {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+}
+
+
