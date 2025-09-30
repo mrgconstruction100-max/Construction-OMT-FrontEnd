@@ -932,10 +932,10 @@ export default function PhaseDetail() {
           setEditIncome(null);
           // Clear after close
             setSelectedProject(null);
-            setSelectedPhase(null);
+            
         }}
         
-        selectedPhase={selectedPhase} // Pass selected task
+        
         selectedProject={selectedProject} // Pass selected project
         onSubmit={handleAddIncome}
         onEdit={handleEditIncome}

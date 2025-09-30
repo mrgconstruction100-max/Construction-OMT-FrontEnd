@@ -12,7 +12,9 @@ import AddProject from "@/components/models/AddProject";
 import AddPhases from "@/components/models/AddPhases";
 import AddTasks from "@/components/models/AddTask";
 import API from "@/axios";
+import AddIncome from '@/components/models/AddIncome';
 import './ProjectDetail.css'
+import DataTable from '@/components/Table/DataTable';
 import {
   AlertDialog,
   AlertDialogContent,
@@ -32,16 +34,98 @@ import {
 } from "@/components/ui/dialog"
 
 export default function ProjectDetail() {
+  //Income Table Column
+
+ const incomeColumns =[
+   {
+    id: "actions",
+    header: "Actions",
+    cell: ({ row }) => (
+      <div className="flex gap-2">
+        <Button
+          size="icon"
+          variant="default"
+          onClick={(e) => {
+            e.stopPropagation(); // prevent row click navigation
+            setEditIncome(row.original); // pass whole row data
+            setShowIncomeModal(true);
+          }}
+        >
+          <Edit className="w-4 h-4" />
+        </Button>
+        <Button
+          size="icon"
+          variant="destructive"
+          onClick={(e) => {
+            e.stopPropagation();
+            setConfirmIncomeDialog({ open: true, incomeId:row.original._id });
+          }}
+        >
+          <Trash2 className="w-4 h-4" />
+        </Button>
+      </div>
+    ),
+  },
+   {
+    accessorKey: 'customId',
+    header: 'Income ID',
+  },
+  {
+    accessorKey: 'name',
+    header: 'Income ',
+    cell: info => info.getValue()?.toString().slice(0, 20) || '-', // truncate if long
+  },
+    {
+    accessorKey: 'amount',
+    header: 'Amount ',
+     cell: info => {
+      const amount = info.getValue();
+      return formatCurrency(amount) || 'N/A'; // ✅ Display task name instead of object
+    },
+  },
+
+    {
+    accessorKey: 'projectId',
+    header: 'Project',
+    cell: info => {
+      const project = info.getValue();
+      return project?.name || 'N/A'; // ✅ Display project name instead of object
+    },
+  },
+  
+  
+  {
+    accessorKey: 'paymentDate',
+    header: 'Payment Date',
+    cell: info => new Date(info.getValue() ).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    }),
+  },
+  {
+    accessorKey: 'paymentMethod',
+    header: 'Payment Method',
+    
+  },
+   {
+    accessorKey: 'transactionNo',
+    header: 'Reference No',
+    cell: info => info.getValue()?.toString().slice(0, 20) || '-', // truncate if long
+  },
+]
   const { id } = useParams();
   const navigate = useNavigate();
-  const { projectContext,setProjectContext,phaseContext,setPhaseContext,taskContext,setTaskContext,memberContext,clientContext,expenseContext,incomeContext } = useData();
+  const { projectContext,setProjectContext,phaseContext,setPhaseContext,taskContext,setTaskContext,memberContext,clientContext,expenseContext,incomeContext,setIncomeContext } = useData();
   const [project,setProject] = useState('');
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [editingProject,setEditProject] = useState(null);
+   const [globalFilter, setGlobalFilter] = useState('');
   const [infoDialog, setInfoDialog] = useState({ open: false, type: "", message: "" });
   const [confirmDialog, setConfirmDialog] = useState({ open: false, projectId: null });
   const [confirmPhaseDialog, setConfirmPhaseDialog] = useState({ open: false, phaseId: null });
   const [confirmTaskDialog, setConfirmTaskDialog] = useState({ open: false, incomeId: null });
+  const [confirmIncomeDialog, setConfirmIncomeDialog] = useState({ open: false, incomeId: null });
   const [projectOptions,setProjectOptions]= useState([]);
   const [phaseOptions,setPhaseOptions] =useState([]);
   const [memberOptions,setMemberOptions] = useState([]);
@@ -59,19 +143,22 @@ export default function ProjectDetail() {
   const [showTaskModal, setShowTaskModal] = useState(false);
    const [editingTask, setEditTask] = useState(null);
     const {user} = useAuth();
-  
+  //Income
+    const [incomes,setIncomes] = useState([]);
+     const [showIncomeModal, setShowIncomeModal] = useState(false);
+     const [editingIncome, setEditIncome] = useState(null);
   
 
   useEffect(()=>{
     const updatedProject = projectContext.find((p) => p._id === id);
-    const filteredPhases = phaseContext.filter((phase)=> String(phase.projectId?._id)===String(updatedProject?._id));
-    const filteredTasks = taskContext.filter((task)=> String(task.projectId?._id)===String(updatedProject?._id));
+    const filteredPhases = phaseContext.filter((phase)=> String(phase?.projectId?._id)===String(updatedProject?._id));
+    const filteredTasks = taskContext.filter((task)=> String(task?.projectId?._id)===String(updatedProject?._id));
      const expenseProject = expenseContext.filter(
-        (expense) => String(expense.projectId?._id) === String(updatedProject?._id)
+        (expense) => String(expense?.projectId?._id) === String(updatedProject?._id)
       );
 
        const incomeProject = incomeContext.filter(
-        (income) => String(income.projectId?._id) === String(updatedProject?._id)
+        (income) => String(income?.projectId?._id) === String(updatedProject?._id)
       );
        const revenue = incomeProject.reduce(
         (sum, income) => sum + (income?.amount || 0),
@@ -107,7 +194,7 @@ export default function ProjectDetail() {
     setPhases(filteredPhases);
     const updatedTasks = filteredTasks.map((task) => {
       const expenseTasks = expenseContext.filter(
-        (expense) => String(expense.taskId?._id) === String(task._id)
+        (expense) => String(expense?.taskId?._id) === String(task._id)
       );
 
       const totalExpense = expenseTasks.reduce(
@@ -124,6 +211,7 @@ export default function ProjectDetail() {
       };
     });
     setTasks(updatedTasks);
+    setIncomes(incomeProject);
   },[phaseContext,taskContext,projectContext,memberContext,clientContext])
   
   const fetchOptions = ()=>{
@@ -148,7 +236,9 @@ export default function ProjectDetail() {
       })
       ))
     }
-  
+  const handleRowClick = (row) => {
+        navigate(`/income/${row._id}`);
+    };
   const  formatDate = (dateString) => {
    if (!dateString) return "N/A";
   const date = new Date(dateString);
@@ -192,12 +282,12 @@ export default function ProjectDetail() {
   };
    const handleEditProject = async(updated) => {
      
-    const manager = memberOptions.find(m=> m.value === updated.projectManager);
-      const client = clientOptions.find(m=> m.value === updated.clientId);
+    const manager = memberOptions.find(m=> m.value === updated?.projectManager);
+      const client = clientOptions.find(m=> m.value === updated?.clientId);
       const updatedProject = {
         ...updated,
-        projectManager:{_id:updated.projectManager,name:manager?.label||""},
-        clientId:{_id:updated.clientId,name:client?.label||""}
+        projectManager:{_id:updated?.projectManager,name:manager?.label||""},
+        clientId:{_id:updated?.clientId,name:client?.label||""}
       }
      setProject(updatedProject);
     setProjectContext(prev =>
@@ -217,6 +307,7 @@ export default function ProjectDetail() {
        try{
           
          const filteredPhases = phaseContext.filter((phase) => String(phase.projectId._id) === String(id) );
+          const filteredIncomes = incomeContext.filter((income)=> String(income?.projectId._id)===String(id));
           if(filteredPhases.length>0){
                setInfoDialog({
                   open: true,
@@ -225,7 +316,14 @@ export default function ProjectDetail() {
                 });
             return;
           }
-         
+           if(filteredIncomes.length>0){
+               setInfoDialog({
+                  open: true,
+                  type: "error",
+                  message: "This Project contains incomes. You can't delete it.",
+                });
+            return;
+          }
           
             
             await API.delete(`/project/${id}`);
@@ -292,7 +390,6 @@ const handleAddPhase = async (phaseData) => {
        try{
           
           const filteredTasks = taskContext.filter((task) => String(task?.phaseId?._id) === String(id) );
-          const filteredIncomes = incomeContext.filter((income)=> String(income?.phaseId?._id)===String(id));
           if(filteredTasks.length>0){
                setInfoDialog({
                   open: true,
@@ -300,17 +397,7 @@ const handleAddPhase = async (phaseData) => {
                   message: "This Phase is used for creating tasks. You can't delete it.",
                 });
             return;
-          }
-         if(filteredIncomes.length>0){
-               setInfoDialog({
-                  open: true,
-                  type: "error",
-                  message: "This Phase contains incomes. You can't delete it.",
-                });
-            return;
-          }
-          
-            
+          }       
             await API.delete(`/phase/${id}`);
            
             setPhaseContext(prev => prev.filter(phase=> phase._id !== id));
@@ -418,6 +505,72 @@ const handleAddPhase = async (phaseData) => {
   }
 };
 
+/***************INCOME ****************/
+ const handleAddIncome = async (incomeData) => {
+   try {
+       const project = projectOptions.find(p=>p.value ===incomeData.projectId);
+
+      const newIncome = {
+        ...incomeData,
+        projectId:{_id:incomeData?.projectId,name:project?.label || ''},
+
+    
+      }
+      setIncomes(prev => [...prev, newIncome]);
+      setIncomeContext(prev=>[...prev,newIncome]);
+    } catch (error) {
+       console.error("Error adding Income:", error);
+    }
+  };
+
+  const handleEditIncome = async(updated) => {
+     
+     const project = projectOptions.find(p=>p.value ===updated.projectId);
+     
+      const updatedIncome = {
+        ...updated,
+        projectId:{_id:updated?.projectId,name:project?.label || ''},
+       
+        
+    
+      }
+
+     setIncomes(prev =>
+      prev.map((income) => income._id === updated._id ? updatedIncome : income)
+    );
+    
+    setIncomeContext(prev =>
+      prev.map((income) => income._id === updated._id ? updatedIncome : income)
+    );
+    setEditIncome(null);
+    setShowIncomeModal(false);
+  };
+
+  const handleDeleteIncome =async () => {
+      const id = confirmIncomeDialog.incomeId
+       setConfirmIncomeDialog({ open: false, incomeId: null })
+       try{
+    
+            await API.delete(`/income/${id}`);
+            setIncomes(incomes.filter(income =>income._id !== id));
+            setIncomeContext(incomeContext.filter(income =>income._id !== id));
+            setInfoDialog({
+                open: true,
+                type: "success",
+                message: "Income deleted successfully.",
+              });         
+        }
+        catch(err){
+            console.error(err);
+             setInfoDialog({
+              open: true,
+              type: "error",
+              message: "Failed to delete income.",
+            });
+            
+          }
+     }
+
 const handleform = (type , phase = null , project=null)=>{
       if (type === 'task') {
         setEditTask(null);
@@ -430,6 +583,11 @@ const handleform = (type , phase = null , project=null)=>{
         setEditPhase(null); // ✅ Clear old edit state
         setSelectedProject(project); // Set selected project
         setShowPhaseModal(true);
+  }
+ if (type === 'income') {
+        setEditIncome(null); // ✅ Clear old edit state
+        setSelectedProject(project); // Set selected project
+        setShowIncomeModal(true);
   }
 }
   if (!project) return <p className="p-6">Phase not found</p>;
@@ -445,9 +603,6 @@ const handleform = (type , phase = null , project=null)=>{
           <Badge>{getStatusColor(project.status)}</Badge>
         </div>
         <div className="flex gap-2">
-          {/* <Button variant="outline" onClick={() => navigate(-1)}>
-            <ArrowLeft className="w-4 h-4 mr-2" /> Back
-          </Button> */}
           <Button className="bg-gradient-primary hover:opacity-90 transition-smooth shadow-construction flex-1 sm:flex-none"
           onClick={() => handleEdit(project)}>
             <Edit className="w-4 h-4 mr-2" /> Edit
@@ -547,11 +702,11 @@ const handleform = (type , phase = null , project=null)=>{
           </div>
            <div className="flex items-center gap-2 text-sm">
               <ReceiptIndianRupee className="w-4 h-4" />
-              <span>Client Payments: ₹{project.revenue}</span>
+              <span>Client Payments: ₹{project?.revenue}</span>
             </div>
             <div className="flex items-center gap-2 text-sm ">
               <ReceiptIndianRupee className="w-4 h-4" />
-              <span>Pending from Clients: ₹{project.pending}</span>
+              <span>Pending from Clients: ₹{project?.pending}</span>
             </div>
         
           <div></div>
@@ -559,6 +714,29 @@ const handleform = (type , phase = null , project=null)=>{
    
         </CardContent>
       </Card>
+      {incomes.length>0?<div className="space-y-6 ">
+          <div className=" flex items-center justify-between ">
+            <h1 className="text-2xl font-bold">Related Incomes </h1>
+            <Button onClick={() => handleform("income",null, project)}>
+              <ReceiptIndianRupee className="w-4 h-4 mr-2" /> Add Income
+            </Button>
+            </div>
+          <DataTable data={incomes} columns={incomeColumns} globalFilter={globalFilter}
+            onGlobalFilterChange={setGlobalFilter} onRowClick={handleRowClick}/>
+           
+          </div>  :
+  
+          
+            <Card className="p-10 flex flex-col items-center justify-center text-center border-dashed border-2">
+    <ReceiptText className="w-12 h-12 text-gray-400 mb-4" />
+    <p className="text-lg font-medium text-gray-600">No income yet</p>
+    <p className="text-sm text-gray-500 mb-4">Start by adding your first income for this phase</p>
+    <Button onClick={() => handleform("income", null, project)}>
+      <ReceiptIndianRupee className="w-4 h-4 mr-2" /> Add Income
+    </Button>
+  </Card>
+  
+  }
       {/* Kanban Board Layout */}
        
       {phases.length>0?
@@ -738,8 +916,19 @@ const handleform = (type , phase = null , project=null)=>{
          onEdit={handleEditTask}
          editTask={editingTask}
       />
-   
-
+      <AddIncome
+        isOpen={showIncomeModal}
+        onClose={() => {
+          setShowIncomeModal(false);
+          setEditIncome(null);
+            setSelectedProject(null);
+            
+        }}
+        selectedProject={selectedProject} // Pass selected project
+        onSubmit={handleAddIncome}
+        onEdit={handleEditIncome}
+        editIncome={editingIncome}
+      />
     {/* Confirm Delete AlertDialog for Phase */}
                   <AlertDialog open={confirmDialog.open} onOpenChange={(open) => setConfirmDialog({ ...confirmDialog, open })}>
                     <AlertDialogContent>
@@ -790,6 +979,25 @@ const handleform = (type , phase = null , project=null)=>{
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
                             <AlertDialogAction onClick={handleDeletePhase}>Yes, Delete</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+
+                 {/* Confirm Delete AlertDialog for Income */}
+                  <AlertDialog
+                        open={confirmIncomeDialog.open}
+                        onOpenChange={(open) => setConfirmIncomeDialog({ ...confirmIncomeDialog, open })}
+                      >
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. Do you really want to delete this income?
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleDeleteIncome}>Yes, Delete</AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>

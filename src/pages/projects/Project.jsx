@@ -202,22 +202,22 @@ export default function Projects() {
     const updatedProjects = projectContext.map((project) => {
     
        const projectTasks = taskContext.filter(
-        (task) => String(task.projectId?._id) === String(project._id)
+        (task) => String(task?.projectId?._id) === String(project?._id)
       );
 
       const completedTasks = projectTasks.filter(task=> String(task?.status)==="Completed");
       let progress=0;
-       if (projectTasks.length > 0) {
-          progress = (completedTasks.length / projectTasks.length) * 100;
+       if (projectTasks?.length > 0) {
+          progress = (completedTasks?.length / projectTasks?.length) * 100;
         }
 
         // round to 1 decimal place
         progress = Number(progress.toFixed(1));
       const expenseProjects = expenseContext.filter(
-        (expense) => String(expense.projectId?._id) === String(project._id)
+        (expense) => String(expense?.projectId?._id) === String(project?._id)
       );
        const incomeProjects = incomeContext.filter(
-        (income) => String(income.projectId?._id) === String(project._id)
+        (income) => String(income?.projectId?._id) === String(project?._id)
       ); 
       const totalBudget = projectTasks.reduce(
         (sum, task) => sum + (task?.budget || 0),
@@ -251,25 +251,25 @@ export default function Projects() {
 
     const fetchOptions = ()=>{
       setMemberOptions(memberContext.map(member=>({
-        value:member._id,
-        label:member.name,
+        value:member?._id,
+        label:member?.name,
       })
       ))
       setClientOptions(clientContext.map(client=>({
-        value:client._id,
-        label:client.name,
+        value:client?._id,
+        label:client?.name,
       })
       ))
     }
      // ✅ Add Project (Backend) +Local state
   const handleAddProject = async (projectData) => {
     try {
-      const manager = memberOptions.find(m=> m.value === projectData.projectManager);
-      const client = clientOptions.find(m=> m.value === projectData.clientId);
+      const manager = memberOptions.find(m=> m.value === projectData?.projectManager);
+      const client = clientOptions.find(m=> m.value === projectData?.clientId);
       const newProject = {
         ...projectData,
-        projectManager:{_id:projectData.projectManager,name:manager?.label||""},
-        clientId:{_id:projectData.clientId,name:client?.label||""}
+        projectManager:{_id:projectData?.projectManager,name:manager?.label||""},
+        clientId:{_id:projectData?.clientId,name:client?.label||""}
       }
       setProjects(prev => [...prev, newProject]);
       setAllProjects(prev => [...prev, newProject]);
@@ -280,12 +280,12 @@ export default function Projects() {
   };
   // ✅ Update Project in front end for quick response
     const handleEditProject = async(updated) => {
-       const manager = memberOptions.find(m=> m.value === updated.projectManager);
-      const client = clientOptions.find(m=> m.value === updated.clientId);
+       const manager = memberOptions.find(m=> m.value === updated?.projectManager);
+      const client = clientOptions.find(m=> m.value === updated?.clientId);
       const updatedProject = {
         ...updated,
-        projectManager:{_id:updated.projectManager,name:manager?.label||""},
-        clientId:{_id:updated.clientId,name:client?.label||""}
+        projectManager:{_id:updated?.projectManager,name:manager?.label||""},
+        clientId:{_id:updated?.clientId,name:client?.label||""}
       }
         setProjects(prev =>
           prev.map((project) => project._id === updated._id ? updatedProject : project)
@@ -309,7 +309,8 @@ export default function Projects() {
        setConfirmDialog({ open: false, projectId: null })
        try{
           
-          const filteredPhases = phaseContext.filter((phase) => String(phase.projectId._id) === String(id) );
+          const filteredPhases = phaseContext.filter((phase) => String(phase?.projectId?._id) === String(id) );
+          const filteredIncomes = incomeContext.filter((income)=> String(income?.projectId?._id)===String(id));
           if(filteredPhases.length>0){
                setInfoDialog({
                   open: true,
@@ -318,7 +319,14 @@ export default function Projects() {
                 });
             return;
           }
-         
+          if(filteredIncomes.length>0){
+               setInfoDialog({
+                  open: true,
+                  type: "error",
+                  message: "This Project  contains incomes. You can't delete it.",
+                });
+            return;
+          }
           
             
             await API.delete(`/project/${id}`);
@@ -330,7 +338,7 @@ export default function Projects() {
                 type: "success",
                 message: "Project deleted successfully.",
               });
-            // alert("Project deleted successfully");
+            
             
         }
         catch(err){
@@ -340,7 +348,7 @@ export default function Projects() {
               type: "error",
               message: "Failed to delete project.",
             });
-            // alert("Failed to delete Project")
+            
           }
      }
 

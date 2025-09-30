@@ -220,7 +220,7 @@ export default function Phases() {
     setAllPhases(updatedPhases);
     fetchProject();
   }
-, [phaseContext, taskContext,expenseContext,incomeContext]);
+, [phaseContext, taskContext,expenseContext]);
 
       const handleAddPhase = async (phaseData) => {
     try {
@@ -277,7 +277,7 @@ export default function Phases() {
        try{
           
           const filteredTasks = taskContext.filter((task) => String(task.phaseId._id) === String(id) );
-          const filteredIncomes = incomeContext.filter((income)=> String(income?.phaseId._id)===String(id));
+          
           if(filteredTasks.length>0){
                setInfoDialog({
                   open: true,
@@ -286,18 +286,7 @@ export default function Phases() {
                 });
             return;
           }
-            if(filteredIncomes.length>0){
-               setInfoDialog({
-                  open: true,
-                  type: "error",
-                  message: "This Phase is contains incomes. You can't delete it.",
-                });
-            return;
-          }
-         
-          
-            
-            await API.delete(`/phase/${id}`);
+           await API.delete(`/phase/${id}`);
             setPhases(phases.filter(phase => phase._id !== id));
             setAllPhases(allPhases.filter(phase => phase._id !== id));
             setPhaseContext(phaseContext.filter(phase=> phase._id !== id));
@@ -440,8 +429,7 @@ const phaseFilterConfig = {
     setActiveFilters({});
     setFilterValues({});
   };
-//   const unique = (arr) => [...new Set(arr.filter(Boolean))]; // Removes duplicates & empty
-// const locations = unique(allProjects.map((p) => p?.location));
+
   return (
     <>
    
