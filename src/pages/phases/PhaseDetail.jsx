@@ -283,8 +283,12 @@ export default function PhaseDetail() {
         (sum, expense) => sum + (expense?.amount || 0),
         0
       );
-      const totalBalance = updatedPhase?.budget-totalExpense;
-      const pending = updatedPhase?.budget-revenue;
+       const totalBudget = filteredTasks.reduce(
+        (sum, task) => sum + (task?.budget || 0),
+        0
+      );
+      const totalBalance = totalBudget-totalExpense;
+      const pending = totalBudget-revenue;
      
       const completedTasks =filteredTasks.filter(task=> String(task?.status)==="Completed");
       let progress=0;
@@ -296,6 +300,7 @@ export default function PhaseDetail() {
         progress = Number(progress.toFixed(1));
     setPhase({
        ...updatedPhase,
+       budget:totalBudget,
        budgetBalance:totalBalance,
        expense:totalExpense,
        progress,
