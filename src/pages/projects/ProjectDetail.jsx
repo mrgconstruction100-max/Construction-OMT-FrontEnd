@@ -168,8 +168,12 @@ export default function ProjectDetail() {
         (sum, expense) => sum + (expense?.amount || 0),
         0
       );
-      const totalBalance = updatedProject?.budget-totalExpense;
-      const pending = updatedProject?.budget-revenue;
+        const totalBudget = filteredTasks.reduce(
+        (sum, task) => sum + (task?.budget || 0),
+        0
+      );
+      const totalBalance = totalBudget-totalExpense;
+      const pending = totalBudget-revenue;
       const completedTasks =filteredTasks.filter(task=> String(task?.status)==="Completed");
       const completedPhases =filteredPhases.filter(phase=> String(phase?.status)==="Completed");
       let progress=0;
@@ -181,6 +185,7 @@ export default function ProjectDetail() {
         progress = Number(progress.toFixed(1));
     setProject({
        ...updatedProject,
+       budget:totalBudget,
        budgetBalance:totalBalance,
        expense:totalExpense,
        progress,
@@ -777,7 +782,7 @@ const handleform = (type , phase = null , project=null)=>{
           <CheckSquare className="w-4 h-4" /> Add Task
         </Button>
       </div>
-      <span className="text-xs text-gray-500 mb-2">{phase.customId}</span>
+      <span className="text-xs text-gray-500 mb-2">{phase.typeId}</span>
 
       {/* Task Cards */}
       <div className="space-y-3  gap-3">
@@ -819,18 +824,18 @@ const handleform = (type , phase = null , project=null)=>{
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Tags className="w-4 h-4" />
                     <span>Task Id:</span>
-                    <span className="font-medium text-foreground"> {task?.customId}</span>
+                    <span className="font-medium text-foreground"> {task?.typeId}</span>
                   </div>
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Calendar className="w-4 h-4" />
                     <span>Timeline:</span>
                     <span className="font-medium text-foreground">{formatDate(task?.startDate)} - {formatDate(task?.endDate)}</span>
                   </div>
-                  
+{/*                   
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Users className="w-4 h-4" />
                     <span className="font-medium text-foreground">{task?.teamSize} team members</span>
-                  </div>
+                  </div> */}
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <ReceiptIndianRupee className="w-4 h-4" />
                     

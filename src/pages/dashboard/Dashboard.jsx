@@ -86,8 +86,8 @@ const Dashboard = () => {
   }
      const handleAddProject = (projectData) => {
  // setProjectData(prev => [...prev, newProject]);
-  const manager = memberOptions.find(m=> m.value === projectData.projectManager);
-      const client = memberOptions.find(m=> m.value === projectData.clientId);
+  const manager = memberOptions.find(m=> m.value === projectData?.projectManager);
+      const client = memberOptions.find(m=> m.value === projectData?.clientId);
       const newProject = {
         ...projectData,
         projectManager:{_id:projectData.projectManager,name:manager?.label||""},
@@ -98,10 +98,10 @@ const Dashboard = () => {
 
 const handleAddTask = (taskData) => {
   //setTaskData(prev => [...prev, newTask]);
-  const project = projectOptions.find(p=>p.value ===taskData.projectId);
-      const phase = phaseOptions.find(ph=>ph.value===taskData.phaseId);
+  const project = projectOptions.find(p=>p.value ===taskData?.projectId);
+      const phase = phaseOptions.find(ph=>ph.value===taskData?.phaseId);
       const members = memberOptions.filter((m) =>
-        taskData.assignedTo.includes(m.value)
+        taskData?.assignedTo.includes(m.value)
       );
       const newTask = {
         ...taskData,
@@ -115,7 +115,7 @@ const handleAddTask = (taskData) => {
 
 const handleAddPhase = (phaseData) => {
   //setPhaseData(prev => [...prev, newPhase]);
-  const project = projectOptions.find(p=>p.value ===phaseData.projectId);
+  const project = projectOptions.find(p=>p.value ===phaseData?.projectId);
 
       const newPhase = {
         ...phaseData,
@@ -126,9 +126,9 @@ const handleAddPhase = (phaseData) => {
 
 const handleAddExpense =(expenseData)=>{ 
   //setExpense(prev=>[...prev,newExpense]);
-  const project = projectOptions.find(p=>p.value ===expenseData.projectId);
-      const phase = phaseOptions.find(ph=>ph.value===expenseData.phaseId);
-      const task = taskOptions.find(t=>t.value===expenseData.taskId);
+  const project = projectOptions.find(p=>p.value ===expenseData?.projectId);
+      const phase = phaseOptions.find(ph=>ph.value===expenseData?.phaseId);
+      const task = taskOptions.find(t=>t.value===expenseData?.taskId);
       const newExpense = {
         ...expenseData,
         projectId:{_id:expenseData?.projectId,name:project?.label || ''},
@@ -140,15 +140,11 @@ const handleAddExpense =(expenseData)=>{
   setExpenseContext(prev => [...prev, newExpense]);
 }
 const handleAddIncome =(incomeData)=>{ 
-  //setExpense(prev=>[...prev,newExpense]);
-  const project = projectOptions.find(p=>p.value ===incomeData.projectId);
-      const phase = phaseOptions.find(ph=>ph.value===incomeData.phaseId);
+  const project = projectOptions.find(p=>p.value ===incomeData?.projectId);
+     
       const newIncome = {
         ...incomeData,
-        projectId:{_id:incomeData?.projectId,name:project?.label || ''},
-        phaseId:{_id:incomeData?.phaseId,name:phase?.label || ''},
-      
-    
+        projectId:{_id:incomeData?.projectId,name:project?.label || ''}, 
       }
   setIncomeContext(prev => [...prev, newIncome]);
 }
@@ -173,7 +169,7 @@ const handleAddIncome =(incomeData)=>{
           <StatsCard
             title="Active Projects"
             value={Projects?.activeProjects}
-            description={`Out of ${Projects.totalProjects || 0} total projects`}
+            description={`Out of ${Projects?.totalProjects || 0} total projects`}
             icon={<Building2 className="w-5 h-5" />}
             to="/projects" 
             // trend={{ value: 15, isPositive: true }}
@@ -189,7 +185,7 @@ const handleAddIncome =(incomeData)=>{
           {user.role==="Admin"&&
           <StatsCard
             title="Team Members"
-            value={memberContext.length}
+            value={memberContext?.length}
             description="Across all projects"
             icon={<Users className="w-5 h-5" />}
              to="/members" 

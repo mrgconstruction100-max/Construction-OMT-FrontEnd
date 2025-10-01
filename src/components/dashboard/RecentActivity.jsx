@@ -7,18 +7,6 @@ import API from "../../axios";
 import { useNavigate } from "react-router-dom";
 
 
-
-// const getActivityColor = (type) => {
-//   switch (type) {
-//     case "PROJECT": return "bg-primary text-primary-foreground";
-//     case "TASK": return "bg-success text-success-foreground";
-//     case "MEMBER": return "bg-secondary text-secondary-foreground";
-//     case "PHASE": return "bg-warning text-warning-foreground";
-//     case "EXPENSE": return "bg-warning text-warning-foreground";
-//     case "USER": return "bg-warning text-warning-foreground";
-//     default: return "bg-muted text-muted-foreground";
-//   }
-// };
 const getActivityColor = (type) => {
   switch (type) {
     case "PROJECT":

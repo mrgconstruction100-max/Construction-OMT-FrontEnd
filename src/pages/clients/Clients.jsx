@@ -101,7 +101,7 @@ function Clients() {
           }, [clientContext]);
 
     const fetchData = async()=>{
-      const client = await clientContext.sort((a,b)=>a.customId-b.customId)
+      const client = await clientContext.sort((a,b)=>a.createdAt-b.createdAt)
       setClientsData(client);
       setAllClients(clientContext);
       setLoading(false);

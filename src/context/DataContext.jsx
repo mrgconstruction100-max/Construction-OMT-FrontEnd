@@ -54,7 +54,7 @@ export const DataProvider = ({ children }) => {
   const fetchMemberData = async () => {
     try {
       const res = await API.get('/member')
-      const sorted = res.data.sort((a, b) => a.customId - b.customId)
+      const sorted = res.data.sort((a, b) => a.createdAt-b.createdAt)
       setMemberContext(sorted);
      
   
@@ -80,7 +80,7 @@ export const DataProvider = ({ children }) => {
   const fetchClientData = async () => {
     try {
       const res = await API.get('/client')
-      const sorted = res.data.sort((a, b) => a.customId - b.customId)
+      const sorted = res.data.sort((a, b) => a.createdAt-b.createdAt)
       setClientContext(sorted);
      
   
@@ -103,7 +103,7 @@ export const DataProvider = ({ children }) => {
   const fetchProjectData = async()=>{
     try{
       const res = await API.get('/project');
-      const sorted = res.data.sort((a,b)=> a.customId-b.customId);
+      const sorted = res.data.sort((a,b)=> a.createdAt-b.createdAt);
       setProjectContext(sorted);
      
     }catch(error){
@@ -115,7 +115,7 @@ export const DataProvider = ({ children }) => {
   const fetchTaskData = async()=>{
     try {
             const res= await API.get("/task");
-            const sorted = res.data.data.sort((a,b)=>a.customId-b.customId);
+            const sorted = res.data.data.sort((a,b)=>a.createdAt-b.createdAt);
             setTaskContext(sorted);
            
             }
@@ -130,7 +130,7 @@ export const DataProvider = ({ children }) => {
 
     try {
            const res=  await API.get("/phase");
-           const sorted = res.data.data.sort((a,b)=>a.customId - b.customId)
+           const sorted = res.data.data.sort((a,b)=>a.createdAt-b.createdAt)
            setPhaseContext(sorted);
          
            

@@ -1,5 +1,5 @@
 import React, {  useState,useEffect } from 'react';
-import { X, CheckSquare, FolderOpen, Calendar, Flag, MapPinned, IndianRupee } from 'lucide-react';
+import { X, CheckSquare, FolderOpen, Calendar, Flag, MapPinned, IndianRupee, TagIcon } from 'lucide-react';
 import FormInput from '../ui/FormInput';
 import DropdownSelect from '../ui/DropdownSelect';
 import styles from './AddModel.module.scss';
@@ -11,6 +11,7 @@ import { useData } from '../../context/DataContext';
 
 function AddTasks({ isOpen, onClose, onSubmit, editTask, onEdit,selectedProject,selectedPhase }) {
     const [formData,setFormData]=useState({
+        typeId:"",
         name:"",
         description:"",
         startDate:null,
@@ -88,6 +89,7 @@ function AddTasks({ isOpen, onClose, onSubmit, editTask, onEdit,selectedProject,
             endDate: editTask.endDate ? new Date(editTask.endDate) : null,});
         } else {
           setFormData({
+            typeId:"",
             name:"",
             description:"",
             startDate:null,
@@ -153,6 +155,7 @@ function AddTasks({ isOpen, onClose, onSubmit, editTask, onEdit,selectedProject,
                     
        
                 setFormData({
+                        typeId:"",
                         name:"",
                         description:"",
                         startDate:null,
@@ -173,15 +176,16 @@ function AddTasks({ isOpen, onClose, onSubmit, editTask, onEdit,selectedProject,
         };
         const handleCancel = () => {
             setFormData({
-            name:"",
-            description:"",
-            startDate:null,
-            endDate:null,
-            budget:"",
-            status:"",
-            projectId:"",
-            phaseId:"",
-            assignedTo:[],
+              typeId:"",
+              name:"",
+              description:"",
+              startDate:null,
+              endDate:null,
+              budget:"",
+              status:"",
+              projectId:"",
+              phaseId:"",
+              assignedTo:[],
            
           
             });
@@ -221,7 +225,14 @@ function AddTasks({ isOpen, onClose, onSubmit, editTask, onEdit,selectedProject,
                                         placeholder="Enter task name"
                                         required
                                         error={errors.name}
-                                        icon={<FolderOpen size={16} />}
+                                        icon={<CheckSquare size={16} />}
+                                        />
+                                        <FormInput
+                                        label="Task Id"
+                                        value={formData.typeId}
+                                        onChange={(value) => setFormData({ ...formData, typeId: value })}
+                                        placeholder="Enter task name"
+                                        icon={<TagIcon size={16} />}
                                         />
                                        
 

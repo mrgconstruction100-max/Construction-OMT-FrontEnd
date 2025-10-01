@@ -1,5 +1,5 @@
 import React, {  useState,useEffect } from 'react';
-import { X, CheckSquare, FolderOpen, Calendar, Flag, MapPinned, IndianRupee } from 'lucide-react';
+import { X, CheckSquare, FolderOpen, Calendar, Flag, MapPinned, IndianRupee, Layers, TagsIcon, TagIcon } from 'lucide-react';
 import FormInput from '../ui/FormInput';
 import DropdownSelect from '../ui/DropdownSelect';
 import styles from './AddModel.module.scss';
@@ -11,6 +11,7 @@ import { useData } from '../../context/DataContext';
 
 function AddPhases({ isOpen, onClose, onSubmit, editPhase, onEdit,selectedProject }) {
     const [formData,setFormData]=useState({
+        typeId:"",
         name:"",
         description:"",
         startDate:null,
@@ -53,6 +54,7 @@ function AddPhases({ isOpen, onClose, onSubmit, editPhase, onEdit,selectedProjec
         else{
           projectFromEdit =selectedProject?._id || ''
           setFormData({
+            typeId:"",
             name:"",
             description:"",
             startDate:null,
@@ -110,6 +112,7 @@ function AddPhases({ isOpen, onClose, onSubmit, editPhase, onEdit,selectedProjec
                     
        
                 setFormData({
+                        typeId:"",
                         name:"",
                         description:"",
                         startDate:null,
@@ -128,14 +131,15 @@ function AddPhases({ isOpen, onClose, onSubmit, editPhase, onEdit,selectedProjec
         };
         const handleCancel = () => {
             setFormData({
-            name:"",
-            description:"",
-            location:"",
-            startDate:null,
-            endDate:null,
-           
-            status:"",
-            projectId:"",
+              typeId:"",
+              name:"",
+              description:"",
+              location:"",
+              startDate:null,
+              endDate:null,
+            
+              status:"",
+              projectId:"",
            
           
             });
@@ -162,7 +166,14 @@ function AddPhases({ isOpen, onClose, onSubmit, editPhase, onEdit,selectedProjec
                                         placeholder="Enter phase name"
                                         required
                                         error={errors.name}
-                                        icon={<FolderOpen size={16} />}
+                                        icon={<Layers size={16} />}
+                                        />
+                                        <FormInput
+                                        label="Phase Id"
+                                        value={formData.typeId}
+                                        onChange={(value) => setFormData({ ...formData, typeId: value })}
+                                        placeholder="Enter phase Id"
+                                        icon={<TagIcon size={16} />}
                                         />
                                        
 

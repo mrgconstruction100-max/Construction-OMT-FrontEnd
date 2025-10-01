@@ -66,7 +66,7 @@ export default function Phases() {
       ),
     },
    {
-    accessorKey: 'customId',
+    accessorKey: 'typeId',
     header: 'Phase ID',
   },
   {
@@ -527,7 +527,7 @@ const phaseFilterConfig = {
           const search = globalFilter?.toLowerCase() || '';
           return (
             phase?.name?.toLowerCase().includes(search) ||
-             phase?._id?.toLowerCase().includes(search)
+             phase?.typeId?.toLowerCase().includes(search)
 
           );
         }).map((phase) => (
@@ -578,7 +578,7 @@ const phaseFilterConfig = {
                     <div className="flex items-center gap-2 text-muted-foreground">
                     <Tags className="w-4 h-4" />
                     <span>Phase Id:</span>
-                    <span className="font-medium text-foreground"> {phase?.customId}</span>
+                    <span className="font-medium text-foreground"> {phase?.typeId}</span>
                   </div>
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Calendar className="w-4 h-4" />

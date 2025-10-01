@@ -273,7 +273,7 @@ export default function PhaseDetail() {
         (expense) => String(expense.phaseId?._id) === String(updatedPhase?._id)
       );
        const incomePhase = incomeContext.filter(
-        (income) => String(income.phaseId?._id) === String(updatedPhase?._id)
+        (income) => String(income?.phaseId?._id) === String(updatedPhase?._id)
       );
       const revenue = incomePhase.reduce(
         (sum, income) => sum + (income?.amount || 0),
@@ -661,12 +661,12 @@ export default function PhaseDetail() {
           <div className="flex items-center gap-2 ">
                 <Tags  className="w-4 h-4"/>
                
-            <p>Phase Id: {phase.customId}</p>
+            <p>Phase Id: {phase?.typeId}</p>
             </div>
              {phase?.description&&<div className="flex items-center gap-2 ">
                 <ReceiptText  className="w-4 h-4"/>
                
-             <p>Description: {phase.description}</p>
+             <p>Description: {phase?.description}</p>
 
             </div>}
            
@@ -840,7 +840,7 @@ export default function PhaseDetail() {
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Tags className="w-4 h-4" />
                     <span>Task Id:</span>
-                    <span className="font-medium text-foreground"> {task?.customId}</span>
+                    <span className="font-medium text-foreground"> {task?.typeId}</span>
                   </div>
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Calendar className="w-4 h-4" />
@@ -848,10 +848,7 @@ export default function PhaseDetail() {
                     <span className="font-medium text-foreground">{formatDate(task?.startDate)} - {formatDate(task?.endDate)}</span>
                   </div>
                   
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Users className="w-4 h-4" />
-                    <span className="font-medium text-foreground">{task?.teamSize} team members</span>
-                  </div>
+                  
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <ReceiptIndianRupee className="w-4 h-4" />
                     

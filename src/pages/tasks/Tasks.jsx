@@ -23,8 +23,6 @@ import { Progress } from "@/components/ui/progress";
 import ViewToggleSwitch from "@/components/Toggle/ViewToggleSwitch";
 import { useNavigate } from "react-router-dom";
 import DataTable from "@/components/Table/DataTable";
-
-import { mockProjects, mockTasks, mockTeamMembers, mockClients } from "@/data/mockData"
 import AddTasks from "@/components/models/AddTask";
 import { useData } from "@/context/DataContext";
 
@@ -98,7 +96,7 @@ export default function Tasks() {
       ),
     },
    {
-    accessorKey: 'customId',
+    accessorKey: 'typeId',
     header: 'Task ID',
   },
   {
@@ -549,7 +547,7 @@ const clearFilter = (filterKey) => {
           const search = globalFilter?.toLowerCase() || '';
           return (
             task.name?.toLowerCase().includes(search) ||
-             task._id?.toLowerCase().includes(search)
+             task.typeId?.toLowerCase().includes(search)
 
           );
         }).map((task) => (
@@ -589,7 +587,7 @@ const clearFilter = (filterKey) => {
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Tags className="w-4 h-4" />
                     <span>Task Id:</span>
-                    <span className="font-medium text-foreground"> {task?.customId}</span>
+                    <span className="font-medium text-foreground"> {task?.typeId}</span>
                   </div>
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Calendar className="w-4 h-4" />
@@ -599,8 +597,11 @@ const clearFilter = (filterKey) => {
                   
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Users className="w-4 h-4" />
-                    <span className="font-medium text-foreground">{task?.teamSize} team members</span>
+                    <span className="font-medium text-foreground">{task.assignedTo?.map((m) => (
+                    <Badge key={m._id}  style={{ cursor: "pointer" }} onClick={()=>navigate(`/member/${m?._id}`)}>{m.name}</Badge>
+              ))}</span>
                   </div>
+                  
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <ReceiptIndianRupee className="w-4 h-4" />
                     {/* <span>${(task.budget / 1000000).toFixed(1)}M budget</span> */}

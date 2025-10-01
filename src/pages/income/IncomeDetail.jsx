@@ -71,13 +71,10 @@ export default function IncomeDetail() {
   const handleEditIncome = async(updated) => {
      
      const project = projectOptions.find(p=>p.value ===updated.projectId);
-      const phase = phaseOptions.find(ph=>ph.value===updated.phaseId);
+    
       const updatedIncome = {
         ...updated,
-        projectId:{_id:updated?.projectId,name:project?.label || ''},
-        phaseId:{_id:updated?.phaseId,name:phase?.label || ''},
-        
-    
+        projectId:{_id:updated?.projectId,name:project?.label || ''},  
       }
      setIncome(updatedIncome);
     setIncomeContext(prev =>

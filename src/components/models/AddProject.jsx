@@ -178,8 +178,6 @@ function AddProject({ isOpen, onClose, onSubmit, editProject, onEdit }) {
                                         value={formData.typeId}
                                         onChange={(value) => setFormData({ ...formData, typeId: value })}
                                         placeholder="Enter project id"
-                                        
-                                        error={errors.name}
                                         icon={<TagIcon size={16} />}
                                         />
                                        

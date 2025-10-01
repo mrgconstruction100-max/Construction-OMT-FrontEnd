@@ -159,16 +159,15 @@ const fetchOptions =() =>{
       })
       ))
     }
-   // ✅ Add Task (Backend) +Local state
+   // ✅ Add Income (Backend) +Local state
   const handleAddIncome = async (incomeData) => {
    try {
       const project = projectOptions.find(p=>p.value ===incomeData.projectId);
-      const phase = phaseOptions.find(ph=>ph.value===incomeData.phaseId);
+      
       const newIncome = {
         ...incomeData,
         projectId:{_id:incomeData?.projectId,name:project?.label || ''},
-        phaseId:{_id:incomeData?.phaseId,name:phase?.label || ''},
-    
+ 
       }
       setIncomes(prev => [...prev, newIncome]);
       setAllIncomes(prev => [...prev, newIncome]);
@@ -181,13 +180,10 @@ const fetchOptions =() =>{
   const handleEditIncome = async(updated) => {
      
      const project = projectOptions.find(p=>p.value ===updated.projectId);
-      const phase = phaseOptions.find(ph=>ph.value===updated.phaseId);
+      
       const updatedIncome = {
         ...updated,
         projectId:{_id:updated?.projectId,name:project?.label || ''},
-        phaseId:{_id:updated?.phaseId,name:phase?.label || ''},
-        
-    
       }
 
      setIncomes(prev =>
@@ -210,19 +206,7 @@ const fetchOptions =() =>{
       const id = confirmDialog.incomeId
        setConfirmDialog({ open: false, incomeId: null })
        try{
-          // const res =await API.get(`/task`);
-          // const filteredPhase = res.data.data.filter((task) => String(task.phaseId._id) === String(id) );
-          // if(filteredTasks.length>0){
-          //      setInfoDialog({
-          //         open: true,
-          //         type: "error",
-          //         message: "This Phase is used for creating tasks. You can't delete it.",
-          //       });
-          //   return;
-          // }
-         
-          
-            
+        
             await API.delete(`/income/${id}`);
             setIncomes(incomes.filter(income =>income._id !== id));
             setAllIncomes(allIncomes.filter(income =>income._id !== id));

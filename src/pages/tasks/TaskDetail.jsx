@@ -396,7 +396,7 @@ export default function TaskDetail() {
            <div className="flex items-center gap-2 ">
                 <Tags   className="w-4 h-4"/>
                
-            <p>Task Id: {task.customId}</p>
+            <p>Task Id: {task.typeId}</p>
             </div>
              {task?.description&&<div className="flex items-center gap-2 ">
                 <ReceiptText  className="w-4 h-4"/>
@@ -444,9 +444,9 @@ export default function TaskDetail() {
           {/* Assigned Members */}
           <div>
             <h3 className="font-medium mb-2">Assigned Members</h3>
-            <div className="flex gap-2 flex-wrap">
+            <div className="flex gap-2 flex-wrap" >
               {task.assignedTo?.map((m) => (
-                <Badge key={m._id} variant="outline">{m.name}</Badge>
+                <Badge key={m._id} variant="outline" style={{ cursor: "pointer" }} onClick={()=>navigate(`/member/${m?._id}`)}>{m.name}</Badge>
               ))}
             </div>
           </div>

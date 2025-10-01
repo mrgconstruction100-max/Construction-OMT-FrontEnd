@@ -68,11 +68,7 @@ function Expense() {
     header: 'Expense ',
     cell: info => info.getValue()?.toString().slice(0, 50) || '-', // truncate if long
   },
-  // {
-  //   accessorKey: 'description',
-  //   header: 'Description ',
-  //   cell: info => info.getValue()?.toString().slice(0, 50) || '-', // truncate if long
-  // },
+
     {
     accessorKey: 'amount',
     header: 'Amount ',
@@ -224,24 +220,12 @@ const fetchOptions =() =>{
   const handleDeleteClick = (id) => {
     setConfirmDialog({ open: true, expenseId: id })
   }
-   //  Delete Task (Backend)
+   //  Delete Expemse (Backend)
      const handleDelete =async () => {
       const id = confirmDialog.expenseId
        setConfirmDialog({ open: false, expenseId: null })
        try{
-          // const res =await API.get(`/task`);
-          // const filteredPhase = res.data.data.filter((task) => String(task.phaseId._id) === String(id) );
-          // if(filteredTasks.length>0){
-          //      setInfoDialog({
-          //         open: true,
-          //         type: "error",
-          //         message: "This Phase is used for creating tasks. You can't delete it.",
-          //       });
-          //   return;
-          // }
-         
-          
-            
+      
             await API.delete(`/expense/${id}`);
             setExpenses(expenses.filter(expense =>expense._id !== id));
             setAllExpenses(allExpenses.filter(expense =>expense._id !== id));

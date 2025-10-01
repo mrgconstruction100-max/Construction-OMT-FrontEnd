@@ -76,19 +76,7 @@ const membersColumns =[
     accessorKey: 'phone',
     header: 'Phone',
   },
-  // {
-  //   accessorKey: 'maritalStatus',
-  //   header: 'Marital Status',
-  // },
-  // {
-  //   accessorKey: 'dateOfBirth',
-  //   header: 'Date of Birth',
-  //   cell: info => new Date(info.getValue()).toLocaleDateString('en-US', {
-  //     year: 'numeric',
-  //     month: 'short',
-  //     day: 'numeric'
-  //   }),
-  // }
+  
 ]
 
 
@@ -115,7 +103,7 @@ export default function Members() {
           }, [memberContext,taskContext]);
 
 const fetchData = async () => {
-  const sortedMembers = [...memberContext].sort((a, b) => a.customId - b.customId);
+  const sortedMembers = [...memberContext].sort((a, b) => a.createdAt - b.createdAt);
 
   const membersWithProjects = sortedMembers.map((member) => {
     const projectCount = taskContext.filter((task) =>
