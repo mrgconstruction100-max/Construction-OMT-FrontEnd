@@ -418,28 +418,28 @@ export default function TaskDetail() {
               <Calendar className="w-4 h-4" /> 
               <span>{formatDate(task.startDate)} - {formatDate(task.endDate)}</span>
             </div>
-            <div className="flex items-center gap-2">
+            {/* <div className="flex items-center gap-2">
               <ReceiptIndianRupee className="w-4 h-4" />
               <span>Budget: ₹{task.budget}</span>
-            </div>
+            </div> */}
             <div className="flex items-center gap-2 ">
               <ReceiptIndianRupee className="w-4 h-4" />
               <span>Expenditure: ₹{task.expense}</span>
             </div>
-            <div className="flex items-center gap-2 ">
+            {/* <div className="flex items-center gap-2 ">
               <ReceiptIndianRupee className="w-4 h-4" />
               <span>Budget Balance: ₹{task.budgetBalance}</span>
-            </div>
+            </div> */}
           
 
           {/* Budget Progress */}
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <div className="flex justify-between ">
               <span>Budget Used</span>
               <span>₹{task.expense} / ₹{task.budget}</span>
             </div>
              <Progress spent={task?.expense} budget={task?.budget} mode="budget" className="h-2" />
-          </div>
+          </div> */}
 
           {/* Assigned Members */}
           <div>

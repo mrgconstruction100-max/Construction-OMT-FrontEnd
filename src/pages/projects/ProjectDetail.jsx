@@ -32,6 +32,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog"
+import AddExpense from "../../components/models/AddExpense";
 
 export default function ProjectDetail() {
   //Income Table Column
@@ -114,9 +115,117 @@ export default function ProjectDetail() {
     cell: info => info.getValue()?.toString().slice(0, 20) || '-', // truncate if long
   },
 ]
+
+const expenseColumns =[
+   {
+    id: "actions",
+    header: "Actions",
+    cell: ({ row }) => (
+      <div className="flex gap-2">
+        <Button
+          size="icon"
+          variant="default"
+          onClick={(e) => {
+            e.stopPropagation(); // prevent row click navigation
+            setEditExpense(row.original); // pass whole row data
+            setShowExpenseModal(true);
+          }}
+        >
+          <Edit className="w-4 h-4" />
+        </Button>
+        <Button
+          size="icon"
+          variant="destructive"
+          onClick={(e) => {
+            e.stopPropagation();
+            setConfirmExpenseDialog({ open: true, expenseId: row.original._id });
+          }}
+        >
+          <Trash2 className="w-4 h-4" />
+        </Button>
+      </div>
+    ),
+  },
+   {
+    accessorKey: 'customId',
+    header: 'Expense ID',
+  },
+  {
+    accessorKey: 'name',
+    header: 'Expense ',
+    cell: info => info.getValue()?.toString().slice(0, 50) || '-', // truncate if long
+  },
+    {
+    accessorKey: 'amount',
+    header: 'Amount ',
+     cell: info => {
+      const amount = info.getValue();
+      return formatCurrency(amount) || 'N/A'; // ✅ Display task name instead of object
+    },
+  },
+  
+  {
+    accessorKey: 'taskId',
+    header: 'Task ',
+    cell: info => {
+      const task = info.getValue();
+      return task?.name || 'N/A'; // ✅ Display task name instead of object
+    },
+  },
+  {
+    accessorKey: 'phaseId',
+    header: 'Phase ',
+    cell: info => {
+      const phase = info.getValue();
+      return phase?.name|| 'N/A'; // ✅ Display task name instead of object
+    },
+  },
+    {
+    accessorKey: 'projectId',
+    header: 'Project',
+    cell: info => {
+      const project = info.getValue();
+      return project?.name || 'N/A'; // ✅ Display project name instead of object
+    },
+  },
+  
+  
+  {
+    accessorKey: 'paymentDate',
+    header: 'Payment Date',
+    cell: info => {
+      const val = info.getValue();
+      if (!val) return "N/A";
+      const d = new Date(val);
+   
+      if (isNaN(d.getTime())) return "N/A";
+      return d.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+  }
+  },
+  {
+    accessorKey: 'paymentMethod',
+    header: 'Payment Method',
+    
+  },
+ 
+  {
+    accessorKey: 'paidTo',
+    header: 'Paid To',
+   
+  },
+  {
+    accessorKey: 'category',
+    header: 'Category',
+   
+  },
+]
   const { id } = useParams();
   const navigate = useNavigate();
-  const { projectContext,setProjectContext,phaseContext,setPhaseContext,taskContext,setTaskContext,memberContext,clientContext,expenseContext,incomeContext,setIncomeContext } = useData();
+  const { projectContext,setProjectContext,phaseContext,setPhaseContext,taskContext,setTaskContext,memberContext,clientContext,expenseContext,setExpenseContext,incomeContext,setIncomeContext } = useData();
   const [project,setProject] = useState('');
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [editingProject,setEditProject] = useState(null);
@@ -126,8 +235,10 @@ export default function ProjectDetail() {
   const [confirmPhaseDialog, setConfirmPhaseDialog] = useState({ open: false, phaseId: null });
   const [confirmTaskDialog, setConfirmTaskDialog] = useState({ open: false, incomeId: null });
   const [confirmIncomeDialog, setConfirmIncomeDialog] = useState({ open: false, incomeId: null });
+   const [confirmExpenseDialog, setConfirmExpenseDialog] = useState({ open: false, expenseId: null });
   const [projectOptions,setProjectOptions]= useState([]);
   const [phaseOptions,setPhaseOptions] =useState([]);
+  const [taskOptions,setTaskOptions] =useState([]);
   const [memberOptions,setMemberOptions] = useState([]);
   const [clientOptions, setClientOptions] = useState([]);
   const [selectedPhase, setSelectedPhase] = useState(null);
@@ -148,6 +259,12 @@ export default function ProjectDetail() {
      const [showIncomeModal, setShowIncomeModal] = useState(false);
      const [editingIncome, setEditIncome] = useState(null);
   
+     //Expense
+     const [expenses, setExpenses] = useState([]);
+     const [showExpenseModal, setShowExpenseModal] = useState(false);
+     const [editingExpense, setEditExpense] = useState(null);
+    
+
 
   useEffect(()=>{
     const updatedProject = projectContext.find((p) => p._id === id);
@@ -168,7 +285,7 @@ export default function ProjectDetail() {
         (sum, expense) => sum + (expense?.amount || 0),
         0
       );
-        const totalBudget = filteredTasks.reduce(
+        const totalBudget = filteredPhases.reduce(
         (sum, task) => sum + (task?.budget || 0),
         0
       );
@@ -196,6 +313,7 @@ export default function ProjectDetail() {
 
     });
     fetchOptions();
+    setExpenses(expenseProject);
     setPhases(filteredPhases);
     const updatedTasks = filteredTasks.map((task) => {
       const expenseTasks = expenseContext.filter(
@@ -217,7 +335,7 @@ export default function ProjectDetail() {
     });
     setTasks(updatedTasks);
     setIncomes(incomeProject);
-  },[phaseContext,taskContext,projectContext,memberContext,clientContext])
+  },[phaseContext,taskContext,projectContext,memberContext,clientContext,incomeContext,expenseContext])
   
   const fetchOptions = ()=>{
     setProjectOptions(projectContext.map(project=>({
@@ -240,9 +358,16 @@ export default function ProjectDetail() {
         label:client.name,
       })
       ))
+      setTaskOptions(taskContext.map(task=>({
+      value:task._id,
+      label:task.name,
+    })))
     }
   const handleRowClick = (row) => {
         navigate(`/income/${row._id}`);
+    };
+    const handleExpenseRowClick = (row) => {
+        navigate(`/expense/${row._id}`);
     };
   const  formatDate = (dateString) => {
    if (!dateString) return "N/A";
@@ -264,18 +389,13 @@ export default function ProjectDetail() {
   }
   const getStatusColor = (status) => {
   switch (status) {
-    case "In Progress":
-      return "bg-blue-500 text-white";
-    case "Cancelled":
-      return "bg-red-900/60 text-white"; // close to #330f0f96
-    case "Completed":
-      return "bg-green-500 text-white";
-    case "Planning":
-      return "bg-yellow-500 text-black";
-    case "On Hold":
-      return "bg-red-500 text-white";
-    default:
-      return "bg-gray-300 text-black";
+    case 'In Progress': return "bg-blue-500 text-white";
+    case 'Delayed': return "bg-orange-500 text-white";
+    case 'Completed': return "bg-green-500 text-white";
+    case "Planning": return "bg-yellow-500 text-black";
+    case 'On Hold': return "bg-red-500 text-white";
+    case 'Cancelled': return "bg-red-600 text-white";
+    default: return "bg-gray-300 text-black";
   }
 };
 
@@ -576,6 +696,76 @@ const handleAddPhase = async (phaseData) => {
           }
      }
 
+/**************EXPENSE ****************/
+// ✅ Add Expense (Backend) +Local state
+  const handleAddExpense = async (expenseData) => {
+   try {
+      const project = projectOptions.find(p=>p.value ===expenseData.projectId);
+      const phase = phaseOptions.find(ph=>ph.value===expenseData.phaseId);
+      const task = taskOptions.find(t=>t.value===expenseData.taskId);
+      const newExpense = {
+        ...expenseData,
+        projectId:{_id:expenseData?.projectId,name:project?.label || ''},
+        phaseId:{_id:expenseData?.phaseId,name:phase?.label || ''},
+        taskId:{_id:expenseData?.taskId,name:task?.label || ''},
+        
+    
+      }
+      setExpenses(prev => [...prev, newExpense]);
+      setExpenseContext(prev=>[...prev,newExpense]);
+    } catch (error) {
+      console.error("Error adding Expense:", error);
+    }
+  };
+
+  const handleEditExpense = async(updated) => {
+     
+     const project = projectOptions.find(p=>p.value ===updated.projectId);
+      const phase = phaseOptions.find(ph=>ph.value===updated.phaseId);
+      const task = taskOptions.find(t=>t.value===updated.taskId);
+      const updatedExpense = {
+        ...updated,
+        projectId:{_id:updated?.projectId,name:project?.label || ''},
+        phaseId:{_id:updated?.phaseId,name:phase?.label || ''},
+        taskId:{_id:updated?.taskId,name:task?.label || ''},
+        
+    
+      }
+     setExpenses(prev =>
+      prev.map((task) => task._id === updated._id ? updatedExpense : task)
+    );
+    setExpenseContext(prev =>
+      prev.map((expense) => expense._id === updated._id ? updatedExpense : expense)
+    );
+    setEditExpense(null);
+    setShowExpenseModal(false);
+  };
+
+    const handleDeleteExpense = async () => {
+  const id = confirmExpenseDialog.expenseId;
+  setConfirmExpenseDialog({ open: false, expenseId: null });
+  try {
+    await API.delete(`/expense/${id}`);
+
+    setExpenseContext(prev => prev.filter(exp => exp._id !== id));
+    setExpenses(prev => prev.filter(exp => exp._id !== id));
+
+    setInfoDialog({
+      open: true,
+      type: "success",
+      message: "Expense deleted successfully.",
+    });
+  } catch (err) {
+    console.error(err);
+    setInfoDialog({
+      open: true,
+      type: "error",
+      message: "Failed to delete expense.",
+    });
+  }
+};
+
+// Function for handle different forms
 const handleform = (type , phase = null , project=null)=>{
       if (type === 'task') {
         setEditTask(null);
@@ -594,6 +784,11 @@ const handleform = (type , phase = null , project=null)=>{
         setSelectedProject(project); // Set selected project
         setShowIncomeModal(true);
   }
+  if (type === 'expense') {
+        setEditExpense(null); // ✅ Clear old edit state
+        setSelectedProject(project); // Set selected project
+        setShowExpenseModal(true);
+  }
 }
   if (!project) return <p className="p-6">Phase not found</p>;
 
@@ -605,7 +800,7 @@ const handleform = (type , phase = null , project=null)=>{
         <div className="flex gap-2 items-center mb-2">
           <Building2/><h1 className="text-2xl font-bold">{project.name}</h1>
           </div>
-          <Badge>{getStatusColor(project.status)}</Badge>
+          <Badge>{getStatusColor(project?.status)}</Badge>
         </div>
         <div className="flex gap-2">
           <Button className="bg-gradient-primary hover:opacity-90 transition-smooth shadow-construction flex-1 sm:flex-none"
@@ -639,6 +834,20 @@ const handleform = (type , phase = null , project=null)=>{
             value={project?.completedTasks?.length || 0}
             description={`Out of ${tasks?.length || 0}  total tasks`}
             icon={<CheckSquare className="w-5 h-5" />}
+            
+          />
+           <StatsCard
+            title="Total Income"
+            value={`₹ ${project?.revenue}`|| 0}
+            description={`for this project`}
+            icon={<ReceiptIndianRupee className="w-5 h-5" />}
+            
+          />
+           <StatsCard
+            title="Total Expense"
+            value={`₹ ${project?.expense}`|| 0}
+            description={`for this project`}
+            icon={<ReceiptIndianRupee className="w-5 h-5" />}
             
           />
          
@@ -742,6 +951,29 @@ const handleform = (type , phase = null , project=null)=>{
   </Card>
   
   }
+  {expenses.length>0?<>
+          <div className=" flex items-center justify-between">
+            <h1 className="text-2xl font-bold">Related Expenses </h1>
+            <Button onClick={() => handleform("expense", null, project)}>
+              <ReceiptIndianRupee className="w-4 h-4 mr-2" /> Add Expense
+            </Button>
+            </div>
+          <DataTable data={expenses} columns={expenseColumns} globalFilter={globalFilter}
+            onGlobalFilterChange={setGlobalFilter} onRowClick={handleExpenseRowClick}/>
+           
+          </>  :
+  
+          
+            <Card className="p-10 flex flex-col items-center justify-center text-center border-dashed border-2">
+    <ReceiptText className="w-12 h-12 text-gray-400 mb-4" />
+    <p className="text-lg font-medium text-gray-600">No expenses yet</p>
+    <p className="text-sm text-gray-500 mb-4">Start by adding your first expense for this task</p>
+    <Button onClick={() => handleform("expense", null, project)}>
+      <ReceiptIndianRupee className="w-4 h-4 mr-2" /> Add Expense
+    </Button>
+  </Card>
+  
+  }
       {/* Kanban Board Layout */}
        
       {phases.length>0?
@@ -831,29 +1063,31 @@ const handleform = (type , phase = null , project=null)=>{
                     <span>Timeline:</span>
                     <span className="font-medium text-foreground">{formatDate(task?.startDate)} - {formatDate(task?.endDate)}</span>
                   </div>
-{/*                   
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Users className="w-4 h-4" />
-                    <span className="font-medium text-foreground">{task?.teamSize} team members</span>
-                  </div> */}
-                  <div className="flex items-center gap-2 text-muted-foreground">
+
+                  {/* <div className="flex items-center gap-2 text-muted-foreground">
                     <ReceiptIndianRupee className="w-4 h-4" />
                     
                     <span>Budget:</span>
                     <span className="font-medium text-foreground"> {formatCurrency(task?.budget)} </span>
+                  </div> */}
+                   <div className="flex items-center gap-2 text-muted-foreground">
+                    <Users className="w-4 h-4" />
+                    <span className="font-medium text-foreground">{task.assignedTo?.map((m) => (
+                    <Badge key={m._id}  style={{ cursor: "pointer" }} onClick={()=>navigate(`/member/${m?._id}`)}>{m.name}</Badge>
+              ))}</span>
                   </div>
                    <div className="flex items-center gap-2 text-muted-foreground">
                     <ReceiptIndianRupee className="w-4 h-4" />
                     <span>Expenditure:</span>
                     <span className="font-medium text-foreground">{formatCurrency(task?.expense)}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-muted-foreground">
+                  {/* <div className="flex items-center gap-2 text-muted-foreground">
                     <ReceiptIndianRupee className="w-4 h-4" />
                     <span>Budget Balance:</span>
                     <span className="font-medium text-foreground">{formatCurrency(task?.totalBalance)}</span>
-                  </div>
+                  </div> */}
                       {/* Budget Progress */}
-                  <div className="space-y-2">
+                  {/* <div className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Budget Used</span>
                       <span className="font-medium">
@@ -861,7 +1095,7 @@ const handleform = (type , phase = null , project=null)=>{
                       </span>
                     </div>
                     <Progress spent={task?.expense} budget={task?.budget} mode="budget" className="h-2" />
-                  </div>
+                  </div> */}
                 </div>
               </CardContent>
             </Card>
@@ -934,7 +1168,20 @@ const handleform = (type , phase = null , project=null)=>{
         onEdit={handleEditIncome}
         editIncome={editingIncome}
       />
-    {/* Confirm Delete AlertDialog for Phase */}
+       <AddExpense
+        isOpen={showExpenseModal}
+        onClose={() => {
+          setShowExpenseModal(false);
+          setEditExpense(null);
+            setSelectedProject(null);
+            
+        }}   
+        selectedProject={selectedProject} // Pass selected project
+        onSubmit={handleAddExpense}
+         onEdit={handleEditExpense}
+         editExpense={editingExpense}
+      />
+    {/* Confirm Delete AlertDialog for Project */}
                   <AlertDialog open={confirmDialog.open} onOpenChange={(open) => setConfirmDialog({ ...confirmDialog, open })}>
                     <AlertDialogContent>
                       <AlertDialogHeader>
@@ -1003,6 +1250,25 @@ const handleform = (type , phase = null , project=null)=>{
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
                             <AlertDialogAction onClick={handleDeleteIncome}>Yes, Delete</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+
+                        {/* Confirm Delete AlertDialog for expense */}
+                     <AlertDialog
+                        open={confirmExpenseDialog.open}
+                        onOpenChange={(open) => setConfirmExpenseDialog({ ...confirmExpenseDialog, open })}
+                      >
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. Do you really want to delete this expense?
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleDeleteExpense}>Yes, Delete</AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>

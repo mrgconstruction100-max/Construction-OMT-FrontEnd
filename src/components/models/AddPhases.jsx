@@ -18,6 +18,7 @@ function AddPhases({ isOpen, onClose, onSubmit, editPhase, onEdit,selectedProjec
         endDate:null,
         status:"",
         projectId:"",
+        budget:"",
 
        
     });
@@ -61,7 +62,7 @@ function AddPhases({ isOpen, onClose, onSubmit, editPhase, onEdit,selectedProjec
             endDate:null,
             status:"",
             projectId:projectFromEdit,
-            
+            budget:"",
            
           });
         }
@@ -77,7 +78,7 @@ function AddPhases({ isOpen, onClose, onSubmit, editPhase, onEdit,selectedProjec
     // if (!formData.endDate) newErrors.endDate = 'End date is required';
     if (!formData.status) newErrors.status = 'Status is required';
     if (!formData.projectId) newErrors.projectId = 'Project is required';
-  
+      if (!formData.budget) newErrors.budget = 'Budget is required';
 
     if (formData.startDate && formData.endDate && formData.startDate > formData.endDate) {
       newErrors.endDate = 'End date must be after start date';
@@ -117,7 +118,7 @@ function AddPhases({ isOpen, onClose, onSubmit, editPhase, onEdit,selectedProjec
                         description:"",
                         startDate:null,
                         endDate:null,
-                       
+                        budget:"",
                         status:"",
                         projectId:"",
                         
@@ -134,10 +135,9 @@ function AddPhases({ isOpen, onClose, onSubmit, editPhase, onEdit,selectedProjec
               typeId:"",
               name:"",
               description:"",
-              location:"",
               startDate:null,
               endDate:null,
-            
+              budget:"",
               status:"",
               projectId:"",
            
@@ -205,6 +205,7 @@ function AddPhases({ isOpen, onClose, onSubmit, editPhase, onEdit,selectedProjec
                                             error={errors.projectId}
                                             disabled={!!selectedProject}
                                           />
+
                                         <DateSelect
                                         label="Start Date"
                                         value={formData.startDate}
@@ -223,7 +224,16 @@ function AddPhases({ isOpen, onClose, onSubmit, editPhase, onEdit,selectedProjec
                                         error={errors.endDate}
                                         />
                                  
-                                       
+                                        <FormInput
+                                        label="Budget"
+                                        type='number'
+                                        value={formData.budget}
+                                        onChange={(value) => setFormData({ ...formData, budget: value })}
+                                        placeholder="Enter amount"
+                                        icon={<IndianRupee size={16} />}
+                                        required
+                                        error={errors.budget}
+                                        />
                                         
                                 </div>                        
                                                               

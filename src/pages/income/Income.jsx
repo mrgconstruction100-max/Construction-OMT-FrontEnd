@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useData } from '@/context/DataContext';
 
 import DataTable from '@/components/Table/DataTable';
-import { Edit, Filter, Pencil, Plus, Search, Trash2 } from 'lucide-react';
+import { Edit, Filter, Pencil, Plus, ReceiptIndianRupee, Search, Trash2 } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from '@/components/ui/button';
 import {
@@ -28,7 +28,7 @@ import API from "@/axios";
 import AddIncome from '@/components/models/AddIncome';
 import FilterComp from '../../components/filter/FilterComp';
 import FilterStatus from '../../components/filter/FilterStatus';
-
+import { StatsCard } from "@/components/dashboard/StatsCard";
 const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
@@ -129,6 +129,7 @@ function Income() {
 ]
   const [incomes, setIncomes] = useState([]);
   const [allIncomes,setAllIncomes] = useState([]);
+  const [totalIncome, setTotalIncome] = useState(0);
   const {incomeContext,setIncomeContext,projectContext,phaseContext,taskContext} = useData();
   const [globalFilter, setGlobalFilter] = useState('');
   const [showModal, setShowModal] = useState(false);
@@ -145,7 +146,16 @@ function Income() {
     setIncomes(incomeContext);
     setAllIncomes(incomeContext);
     fetchOptions();
+        
   },[incomeContext])
+
+  useEffect(() => {
+  const total = incomes.reduce(
+    (sum, income) => sum + (income?.amount || 0),
+    0
+  );
+  setTotalIncome(total);
+}, [incomes]);
 
 const fetchOptions =() =>{
       setProjectOptions(projectContext.map(project=>({
@@ -158,6 +168,7 @@ const fetchOptions =() =>{
         label:phase.name,
       })
       ))
+   
     }
    // ✅ Add Income (Backend) +Local state
   const handleAddIncome = async (incomeData) => {
@@ -313,6 +324,9 @@ const clearFilter = (filterKey) => {
     setActiveFilters({});
     setFilterValues({});
   };
+        
+  const unique = (arr) => [...new Set(arr.filter(Boolean))]; // Removes duplicates & empty
+const paymentMethod = unique(allIncomes.map((i) => i?.paymentMethod));
   return (
         <div >
           <div className="sticky top-12 z-50 flex  justify-between items-center border-b border-border bg-card/80 backdrop-blur-sm w-full  pe-6 ps-4  py-4">
@@ -343,7 +357,7 @@ const clearFilter = (filterKey) => {
                         // { name: "endDate", label: "Date To", type: "endDate" },
                         { name: "project", label: "Project", type: "select", options: projectOptions.map((p) => p.label) },
                         // { name: "phase", label: "Phase", type: "select", options: phaseOptions.map((ph) => ph.label) },
-                        { name: "paymentMethod", label: "Payment Method", type: "select", options: ["Cash", "GPay", "Others"] },
+                        { name: "paymentMethod", label: "Payment Method", type: "select", options: paymentMethod },
                         
                         
                       ]}
@@ -364,6 +378,7 @@ const clearFilter = (filterKey) => {
         onEdit={handleEditIncome}
         editIncome={editingIncome}
       />
+       
 <div className="space-y-6 px-6">
      <div className="mt-16 space-y-6">
       <FilterStatus 
@@ -374,6 +389,20 @@ const clearFilter = (filterKey) => {
                 data-page-type="income"
               />
             <div></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              
+       
+
+                <StatsCard
+                    title="Total Income"
+                    value={formatCurrency(totalIncome)}
+                    icon={<ReceiptIndianRupee className="w-5 h-5" />}
+                  />
+                 
+               
+                
+               
+              </div>
           <DataTable data={incomes} columns={incomeColumns} globalFilter={globalFilter}
             onGlobalFilterChange={setGlobalFilter} onRowClick={handleRowClick}/>
         </div>
@@ -409,3 +438,4 @@ const clearFilter = (filterKey) => {
 }
 
 export default Income
+

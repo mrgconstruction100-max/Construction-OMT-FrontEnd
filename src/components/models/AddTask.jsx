@@ -115,7 +115,7 @@ function AddTasks({ isOpen, onClose, onSubmit, editTask, onEdit,selectedProject,
     if (!formData.projectId) newErrors.projectId = 'Project is required';
     if (!formData.phaseId) newErrors.phaseId = 'Phase is required';
     if (!formData.assignedTo || formData.assignedTo.length === 0) newErrors.assignedTo = 'Assigned To  is required';
-     if (!formData.budget) newErrors.budget = 'Budget is required';
+    //  if (!formData.budget) newErrors.budget = 'Budget is required';
 
     if (formData.startDate && formData.endDate && formData.startDate > formData.endDate) {
       newErrors.endDate = 'End date must be after start date';
@@ -302,7 +302,7 @@ function AddTasks({ isOpen, onClose, onSubmit, editTask, onEdit,selectedProject,
                                         error={errors.endDate}
                                         />
                                  
-                                         <FormInput
+                                         {/* <FormInput
                                         label="Budget"
                                         type='number'
                                         value={formData.budget}
@@ -311,7 +311,7 @@ function AddTasks({ isOpen, onClose, onSubmit, editTask, onEdit,selectedProject,
                                         icon={<IndianRupee size={16} />}
                                         required
                                         error={errors.budget}
-                                        />
+                                        /> */}
                                         
                                 </div>                        
                                                               

@@ -205,6 +205,10 @@ export default function Projects() {
         (task) => String(task?.projectId?._id) === String(project?._id)
       );
 
+      const projectPhases = phaseContext.filter(
+        (phase) => String(phase?.projectId?._id) === String(project?._id)
+      );
+
       const completedTasks = projectTasks.filter(task=> String(task?.status)==="Completed");
       let progress=0;
        if (projectTasks?.length > 0) {
@@ -219,8 +223,8 @@ export default function Projects() {
        const incomeProjects = incomeContext.filter(
         (income) => String(income?.projectId?._id) === String(project?._id)
       ); 
-      const totalBudget = projectTasks.reduce(
-        (sum, task) => sum + (task?.budget || 0),
+      const totalBudget = projectPhases.reduce(
+        (sum, phase) => sum + (phase?.budget || 0),
         0
       );
 

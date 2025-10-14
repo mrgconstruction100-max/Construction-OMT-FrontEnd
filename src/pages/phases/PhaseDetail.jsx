@@ -283,12 +283,12 @@ export default function PhaseDetail() {
         (sum, expense) => sum + (expense?.amount || 0),
         0
       );
-       const totalBudget = filteredTasks.reduce(
-        (sum, task) => sum + (task?.budget || 0),
-        0
-      );
-      const totalBalance = totalBudget-totalExpense;
-      const pending = totalBudget-revenue;
+      //  const totalBudget = filteredTasks.reduce(
+      //   (sum, task) => sum + (task?.budget || 0),
+      //   0
+      // );
+      const totalBalance = updatedPhase?.budget-totalExpense;
+      const pending = updatedPhase?.budget-revenue;
      
       const completedTasks =filteredTasks.filter(task=> String(task?.status)==="Completed");
       let progress=0;
@@ -300,7 +300,7 @@ export default function PhaseDetail() {
         progress = Number(progress.toFixed(1));
     setPhase({
        ...updatedPhase,
-       budget:totalBudget,
+       
        budgetBalance:totalBalance,
        expense:totalExpense,
        progress,
@@ -854,24 +854,30 @@ export default function PhaseDetail() {
                   </div>
                   
                   
-                  <div className="flex items-center gap-2 text-muted-foreground">
+                  {/* <div className="flex items-center gap-2 text-muted-foreground">
                     <ReceiptIndianRupee className="w-4 h-4" />
                     
                     <span>Budget:</span>
                     <span className="font-medium text-foreground"> {formatCurrency(task?.budget)} </span>
-                  </div>
+                  </div> */}
                    <div className="flex items-center gap-2 text-muted-foreground">
                     <ReceiptIndianRupee className="w-4 h-4" />
                     <span>Expenditure:</span>
                     <span className="font-medium text-foreground">{formatCurrency(task?.expense)}</span>
                   </div>
                   <div className="flex items-center gap-2 text-muted-foreground">
+                    <Users className="w-4 h-4" />
+                    <span className="font-medium text-foreground">{task.assignedTo?.map((m) => (
+                    <Badge key={m._id}  style={{ cursor: "pointer" }} onClick={()=>navigate(`/member/${m?._id}`)}>{m.name}</Badge>
+              ))}</span>
+                  </div>
+                  {/* <div className="flex items-center gap-2 text-muted-foreground">
                     <ReceiptIndianRupee className="w-4 h-4" />
                     <span>Budget Balance:</span>
                     <span className="font-medium text-foreground">{formatCurrency(task?.totalBalance)}</span>
-                  </div>
+                  </div> */}
                       {/* Budget Progress */}
-                  <div className="space-y-2">
+                  {/* <div className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Budget Used</span>
                       <span className="font-medium">
@@ -880,7 +886,7 @@ export default function PhaseDetail() {
                     </div>
                     
                      <Progress spent={task?.expense} budget={task?.budget} mode="budget" className="h-2" />
-                  </div>
+                  </div> */}
                 </div>
 
               

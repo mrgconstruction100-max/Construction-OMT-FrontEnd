@@ -22,6 +22,13 @@ function AddExpense({ isOpen, onClose, onSubmit, editExpense, onEdit,selectedTas
         amount:"",
         category:"",
         transactionNo:"",
+        workers:'',
+        salary:'',
+        food:'',
+        quantity:'',
+        price:'',
+        miscellaneous:'',
+        unit:'',
 
        
     });
@@ -56,10 +63,33 @@ function AddExpense({ isOpen, onClose, onSubmit, editExpense, onEdit,selectedTas
 
    useEffect(() => {
        const uniqueCategory = [...new Set(expenseContext.map(e => e.category).filter(Boolean))];
-       const defaultCategory = ["Travel", "Food", "Salary","Materials","Miscellaneous"] ;
+       const defaultCategory = ["Travel", "Labour","Materials","Miscellaneous"] ;
        const combinedCategory =[...new Set([...defaultCategory,...uniqueCategory])];
         setCategory(combinedCategory);
     }, [expenseContext]);
+
+    useEffect(() => {
+              let total = 0;
+
+              // Convert possible empty strings to 0
+              const salary = parseFloat(formData.salary) || 0;
+              const food = parseFloat(formData.food) || 0;
+              const misc = parseFloat(formData.miscellaneous) || 0;
+              const qty = parseFloat(formData.quantity) || 0;
+              const price = parseFloat(formData.price) || 0;
+
+              if (formData.category === "Labour") {
+                total = salary + food + misc;
+              } else if (formData.category === "Materials") {
+                total = qty * price + misc;
+              } else {
+                // For other categories, don't auto-calculate — user will type manually
+                return;
+              }
+
+              // Update total amount in formData
+              setFormData(prev => ({ ...prev, amount: total }));
+            }, [formData.category,formData.salary,formData.food,formData.miscellaneous,formData.quantity,formData.price,]);
 
    useEffect(() => {
     if (!editExpense && !selectedProject && allTasks.length === 0) return;
@@ -101,6 +131,13 @@ function AddExpense({ isOpen, onClose, onSubmit, editExpense, onEdit,selectedTas
               amount: editExpense.amount || "",
               category: editExpense.category || "",
               transactionNo:editExpense.transactionNo ||"",
+              workers:editExpense.workers,
+              salary:editExpense.salary,
+              food:editExpense.food,
+              quantity:editExpense.quantity,
+              price:editExpense.price,
+              miscellaneous:editExpense.miscellaneous,
+              unit:editExpense.unit,
             });
         } else {
           setFormData({
@@ -115,6 +152,13 @@ function AddExpense({ isOpen, onClose, onSubmit, editExpense, onEdit,selectedTas
             amount:"",
             category:"",
             transactionNo:"",
+            workers:'',
+            salary:'',
+            food:'',
+            quantity:'',
+            price:'',
+            miscellaneous:'',
+            unit:'',
            
           });
         }
@@ -164,7 +208,7 @@ function AddExpense({ isOpen, onClose, onSubmit, editExpense, onEdit,selectedTas
                     
        
                 setFormData({
-                        name:"",
+                         name:"",
                         description:"",
                         paymentDate:null,
                         paymentMethod:"",
@@ -175,7 +219,13 @@ function AddExpense({ isOpen, onClose, onSubmit, editExpense, onEdit,selectedTas
                         amount:"",
                         category:"",
                         transactionNo:"",
-                       
+                        workers:'',
+                        salary:'',
+                        food:'',
+                        quantity:'',
+                        price:'',
+                        miscellaneous:'',
+                        unit:'',
      
                 });
                 setErrors({});
@@ -185,17 +235,24 @@ function AddExpense({ isOpen, onClose, onSubmit, editExpense, onEdit,selectedTas
         };
         const handleCancel = () => {
             setFormData({
-            name:"",
-            description:"",
-            paymentDate:null,
-            paymentMethod:"",
-            paidTo:"",
-            projectId:"",
-            phaseId:"",
-            taskId:"",
-            amount:"",
-            category:"",
-            transactionNo:"",
+             name:"",
+              description:"",
+              paymentDate:null,
+              paymentMethod:"",
+              paidTo:"",
+              projectId:"",
+              phaseId:"",
+              taskId:"",
+              amount:"",
+              category:"",
+              transactionNo:"",
+              workers:'',
+              salary:'',
+              food:'',
+              quantity:'',
+              price:'',
+              miscellaneous:'',
+              unit:'',
           
             });
             setErrors({});
@@ -260,9 +317,96 @@ function AddExpense({ isOpen, onClose, onSubmit, editExpense, onEdit,selectedTas
                                         placeholder="Enter Expense Details"
                                         multiline
                                         />
-                                       
+                                         <DropdownSelect
+                                            label="Category"
+                                            options={category.map(c => ({ value: c, label: c }))} // ✅ convert to objects
+                                            value={formData.category}
+                                            onChange={(value) => {setFormData({ ...formData, category: value })
+                                             if (value && !category.includes(value)) setCategory([...category, value]);
+                                         }
+                                          }required
+                                            searchable={true}
+                                            creatable={true} // allow typing new role
+                                            error={errors.category}
+                                            />
 
-                                       
+                                         {/* Show  only if Category is Labour */}
+                                          {(formData.category === "Labour") && (<>
+                                          
+                                            <FormInput
+                                              label="Workers"
+                                              type='number'
+                                              value={formData.workers}
+                                              onChange={(value) => setFormData({ ...formData, workers: value })}
+                                              placeholder="Enter No of workers" 
+                                            />
+                                            <FormInput
+                                              label="Salary"
+                                              type='number'
+                                              value={formData.salary}
+                                              onChange={(value) => setFormData({ ...formData, salary: value })}
+                                              placeholder="Enter salary amount" 
+                                            />
+                                            <FormInput
+                                              label="Food Amount"
+                                              type='number'
+                                              value={formData.food}
+                                              onChange={(value) => setFormData({ ...formData,food: value })}
+                                              placeholder="Enter food amount" 
+                                            />
+                                            <FormInput
+                                              label="Miscellaneous"
+                                              type='number'
+                                              value={formData.miscellaneous}
+                                              onChange={(value) => setFormData({ ...formData, miscellaneous: value })}
+                                              placeholder="Enter miscellaneous amounts" 
+                                            />
+                                            </>
+                                          )}
+
+                                           {/* Show  only if Category is Labour */}
+                                          {(formData.category === "Materials") && (<>
+                                          
+                                            <FormInput
+                                              label="Unit"
+                                              value={formData.unit}
+                                              onChange={(value) => setFormData({ ...formData, unit: value })}
+                                              placeholder="Enter unit type" 
+                                            />
+                                            <FormInput
+                                              label="Quantity"
+                                              type='number'
+                                              value={formData.quantity}
+                                              onChange={(value) => setFormData({ ...formData, quantity: value })}
+                                              placeholder="Enter quantity" 
+                                            />
+                                            <FormInput
+                                              label="Unit Price"
+                                              type='number'
+                                              value={formData.price}
+                                              onChange={(value) => setFormData({ ...formData,price: value })}
+                                              placeholder="Enter unit price" 
+                                            />
+                                            <FormInput
+                                              label="Miscellaneous"
+                                              type='number'
+                                              value={formData.miscellaneous}
+                                              onChange={(value) => setFormData({ ...formData, miscellaneous: value })}
+                                              placeholder="Enter miscellaneous amounts" 
+                                            />
+                                            </>
+                                          )}
+                                             <FormInput
+                                        label="Total Amount"
+                                        type='number'
+                                        value={formData.amount}
+                                        onChange={(value) => setFormData({ ...formData, amount: value })}
+                                        placeholder="Enter amount"
+                                        icon={<IndianRupee size={16} />}
+                                        required
+                                        error={errors.amount}
+                                        disabled={formData.category === "Labour" || formData.category === "Materials"}
+                                        />
 
                                          <DropdownSelect
                                             label="Project Name"
@@ -307,16 +451,7 @@ function AddExpense({ isOpen, onClose, onSubmit, editExpense, onEdit,selectedTas
 
                                 
                                  
-                                         <FormInput
-                                        label="Amount"
-                                        type='number'
-                                        value={formData.amount}
-                                        onChange={(value) => setFormData({ ...formData, amount: value })}
-                                        placeholder="Enter amount"
-                                        icon={<IndianRupee size={16} />}
-                                        required
-                                        error={errors.amount}
-                                        />
+                                      
 
                                          <FormInput
                                         label="Paid To "
@@ -350,26 +485,7 @@ function AddExpense({ isOpen, onClose, onSubmit, editExpense, onEdit,selectedTas
                                               
                                             />
                                           )}
-                                        <DropdownSelect
-                                            label="Category"
-                                            // options={[
-                                            //     { value: "Travel", label: "Travel" },
-                                            //     { value: "Food", label: "Food" },
-                                            //     { value: "Office", label: "Office" },
-                                            //     { value: "Salary", label: "Salary" },
-                                            //     { value: "Materials", label: "Materials" },
-                                            //     { value: "Miscellaneous", label: "Miscellaneous" }
-                                            // ]}
-                                            options={category.map(c => ({ value: c, label: c }))} // ✅ convert to objects
-                                            value={formData.category}
-                                            onChange={(value) => {setFormData({ ...formData, category: value })
-                                             if (value && !category.includes(value)) setCategory([...category, value]);
-                                         }
-                                          }required
-                                            searchable={true}
-                                            creatable={true} // allow typing new role
-                                            error={errors.category}
-                                            />
+                                      
                                 </div>                        
                                                               
                                 <div className={styles.actions}>

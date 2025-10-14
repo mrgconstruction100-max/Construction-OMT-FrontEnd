@@ -165,39 +165,80 @@ export default function ExpenseDetail() {
                
              <p>Description: {expense?.description}</p>
             </div>}
-             <div className="flex items-center gap-2 ">
-                <Layers className="w-4 h-4"/>
-         <p style={{ cursor: "pointer" }} onClick={()=>navigate(`/task/${expense.taskId?._id}`)}>Task Name: {expense.taskId?.name}</p>
-            </div>
-            <div className="flex items-center gap-2 ">
-                <Layers className="w-4 h-4"/>
-         <p style={{ cursor: "pointer" }} onClick={()=>navigate(`/phase/${expense.phaseId?._id}`)}>Phase Name: {expense?.phaseId?.name}</p>
-            </div>
+            
           <div className="flex items-center gap-2 ">
              <Building2 className="w-4 h-4"/>
           <p style={{ cursor: "pointer" }} onClick={()=>navigate(`/project/${expense?.projectId?._id}`)}>Project Name: {expense?.projectId?.name}</p>
            </div>
-           <div className="flex items-center gap-2 ">
-           <ReceiptIndianRupee className="w-4 h-4" />
-           <span>Amount: ₹{expense?.amount}</span>
+           
+            <div className="flex items-center gap-2 ">
+                <Layers className="w-4 h-4"/>
+         <p style={{ cursor: "pointer" }} onClick={()=>navigate(`/phase/${expense.phaseId?._id}`)}>Phase Name: {expense?.phaseId?.name}</p>
             </div>
+             <div className="flex items-center gap-2 ">
+                <Layers className="w-4 h-4"/>
+         <p style={{ cursor: "pointer" }} onClick={()=>navigate(`/task/${expense.taskId?._id}`)}>Task Name: {expense.taskId?.name}</p>
+            </div>
+             
          
             <div className="flex items-center gap-2 ">
               <Calendar className="w-4 h-4" /> 
               <span>Payment Date: {formatDate(expense?.paymentDate)} </span>
             </div>
           
-          {expense?.category&&<div className="flex items-center gap-2 ">
-                <ReceiptText  className="w-4 h-4"/>
-               
-             <p>Category: {expense?.category}</p>
-            </div>}
+        
            
             {expense?.paidTo&&<div className="flex items-center gap-2 ">
                 <ReceiptText  className="w-4 h-4"/>
                
              <p>Paid To: {expense?.paidTo}</p>
             </div>}
+              {expense?.category&&<div className="flex items-center gap-2 ">
+                <ReceiptText  className="w-4 h-4"/>
+               
+             <p>Category: {expense?.category}</p>
+            </div>}
+            {expense?.workers&&<div className="flex items-center gap-2 ">
+                <ReceiptText  className="w-4 h-4"/>
+               
+             <p>No.of Workers: {expense?.workers}</p>
+            </div>}
+            {expense?.salary&&<div className="flex items-center gap-2 ">
+                <ReceiptIndianRupee  className="w-4 h-4"/>
+               
+             <p>Salary Amount: ₹{expense?.salary}</p>
+            </div>}
+            {expense?.food&&<div className="flex items-center gap-2 ">
+                <ReceiptIndianRupee  className="w-4 h-4"/>
+               
+             <p>Food Amount: ₹{expense?.food}</p>
+            </div>}
+            {expense?.unit&&<div className="flex items-center gap-2 ">
+                <ReceiptText  className="w-4 h-4"/>
+               
+             <p>Unit: {expense?.unit}</p>
+            </div>}
+            {expense?.quantity&&<div className="flex items-center gap-2 ">
+                <ReceiptText  className="w-4 h-4"/>
+               
+             <p>Quantity: {expense?.quantity}</p>
+            </div>}
+            {expense?.price&&<div className="flex items-center gap-2 ">
+                <ReceiptIndianRupee  className="w-4 h-4"/>
+               
+             <p>Unit Price: ₹{expense?.price}</p>
+            </div>}
+            
+            {expense?.miscellaneous&&<div className="flex items-center gap-2 ">
+                <ReceiptIndianRupee  className="w-4 h-4"/>
+               
+             <p>Miscellaneous Amount: ₹{expense?.miscellaneous}</p>
+            </div>}
+             <div className="flex items-center gap-2 ">
+           <ReceiptIndianRupee className="w-4 h-4" />
+           <span>Total Amount: ₹{expense?.amount}</span>
+            </div>
+         
          
             
          

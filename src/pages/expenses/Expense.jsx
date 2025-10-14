@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useData } from '@/context/DataContext';
 
 import DataTable from '@/components/Table/DataTable';
-import { Edit, Filter, Pencil, Plus, Search, Trash2 } from 'lucide-react';
+import { Edit, Filter, Pencil, Plus, ReceiptIndianRupee, Search, Trash2 } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from '@/components/ui/button';
 import {
@@ -27,7 +27,7 @@ import API from "@/axios";
 import AddExpense from '@/components/models/AddExpense';
 import FilterComp from '../../components/filter/FilterComp';
 import FilterStatus from '../../components/filter/FilterStatus';
-
+import { StatsCard } from "@/components/dashboard/StatsCard";
 function Expense() {
   const expenseColumns =[
    {
@@ -135,6 +135,7 @@ function Expense() {
 ]
   const [expenses, setExpenses] = useState([]);
   const [allExpenses,setAllExpenses] = useState([]);
+  const [totalExpense,setTotalExpense] = useState(0);
   const {expenseContext,setExpenseContext,projectContext,phaseContext,taskContext} = useData();
   const [globalFilter, setGlobalFilter] = useState('');
   const [showModal, setShowModal] = useState(false);
@@ -153,6 +154,14 @@ function Expense() {
     fetchOptions();
   },[expenseContext])
 
+  useEffect(() => {
+    const total = expenses.reduce(
+      (sum, expense) => sum + (expense?.amount || 0),
+      0
+    );
+    setTotalExpense(total);
+  }, [expenses]);
+  
 const fetchOptions =() =>{
       setProjectOptions(projectContext.map(project=>({
         value:project._id,
@@ -408,6 +417,14 @@ const category = unique(allExpenses.map((e) => e?.category));
                 data-page-type="expense"
               />
             <div></div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <StatsCard
+                        title="Total Expense"
+                        value={formatCurrency(totalExpense)}
+                        icon={<ReceiptIndianRupee className="w-5 h-5" />}
+                      />
+                 
+                 </div>
           <DataTable data={expenses} columns={expenseColumns} globalFilter={globalFilter}
             onGlobalFilterChange={setGlobalFilter} onRowClick={handleRowClick}/>
         </div>

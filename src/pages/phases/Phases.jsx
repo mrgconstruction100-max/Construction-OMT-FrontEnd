@@ -174,6 +174,10 @@ export default function Phases() {
       const phaseTasks = taskContext.filter(
         (task) => String(task.phaseId?._id) === String(phase._id)
       );
+
+      const phaseProject = projectContext.filter(
+        (project)=>String(phase.projectId?._id)===String(project._id)
+      );
       const completedTasks = phaseTasks.filter(task=> String(task?.status)==="Completed");
       let progress=0;
        if (phaseTasks.length > 0) {
@@ -185,34 +189,29 @@ export default function Phases() {
       const expensePhases = expenseContext.filter(
         (expense) => String(expense.phaseId?._id) === String(phase._id)
       );
-      //  const incomePhases = incomeContext.filter(
-      //   (income) => String(income.phaseId?._id) === String(phase._id)
+  
+      // const totalBudget = phaseTasks.reduce(
+      //   (sum, task) => sum + (task?.budget || 0),
+      //   0
       // );
-
-      const totalBudget = phaseTasks.reduce(
-        (sum, task) => sum + (task?.budget || 0),
-        0
-      );
 
       const spent = expensePhases.reduce(
         (sum, expense) => sum + (expense?.amount || 0),
         0
       );
+      const client = phaseProject?.[0]?.clientId?.name || 'N/A';
 
-      // const revenue = incomePhases.reduce(
-      //   (sum, income) => sum + (income?.amount || 0),
-      //   0
-      // );
-
+     
       return {
         ...phase,
-        budget: totalBudget,
+        // budget: totalBudget,
         spent,
-        // revenue,
-        variance: totalBudget - spent,
-        // profit:revenue-spent,
+       
+        variance: phase?.budget - spent,
+       
         progress,
-        // pending:totalBudget-revenue,
+        client,
+      
       };
     });
 
@@ -592,12 +591,7 @@ const phaseFilterConfig = {
                     <span>Allocated Budget:</span>
                     <span className="font-medium text-foreground"> {formatCurrency(phase?.budget)} </span>
                   </div>
-                   {/* <div className="flex items-center gap-2 text-muted-foreground">
-                    <ReceiptIndianRupee className="w-4 h-4" />
-              
-                    <span>Client Payments:</span>
-                    <span className="font-medium text-foreground"> {formatCurrency(phase?.revenue)} </span>
-                  </div> */}
+                
                    <div className="flex items-center gap-2 text-muted-foreground">
                     <ReceiptIndianRupee className="w-4 h-4" />
                 
@@ -622,29 +616,17 @@ const phaseFilterConfig = {
                     <span>Budget Balance:</span>
                     <span className="font-medium text-foreground">{formatCurrency(phase?.variance)}</span>
                   </div>
-                        {/*profit Progress */}
-                  {/* <div className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Return Ratio</span>
-                      <span className="font-medium">
-                        {formatCurrency(phase?.spent)} / {formatCurrency(phase?.revenue)}
-                      </span>
-                    </div>
-                     <Progress spent={phase?.spent} budget={phase?.revenue} mode="budget" className="h-2" />
-                    
-                  </div> */}
                   
-                   {/* <div className="flex items-center gap-2 text-muted-foreground">
-                    <ReceiptIndianRupee className="w-4 h-4" />
-                    <span>Pending from Clients:</span>
-                    <span className="font-medium text-foreground">{formatCurrency(phase?.pending)}</span>
-                  </div> */}
                 </div>
 
                 {/* Phase */}
                 <div className="pt-2 border-t border-muted-foreground/10">
                   <p className="text-xs text-muted-foreground">Project Name</p>
                   <p className="font-medium text-sm">{phase?.projectId?.name}</p>
+                </div>
+                <div className="pt-2 border-t border-muted-foreground/10">
+                  <p className="text-xs text-muted-foreground">Client Name</p>
+                  <p className="font-medium text-sm">{phase?.client}</p>
                 </div>
               </CardContent>
             </Card>

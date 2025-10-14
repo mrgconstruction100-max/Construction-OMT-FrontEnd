@@ -602,24 +602,24 @@ const clearFilter = (filterKey) => {
               ))}</span>
                   </div>
                   
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <ReceiptIndianRupee className="w-4 h-4" />
+                  {/* <div className="flex items-center gap-2 text-muted-foreground">
+                    <ReceiptIndianRupee className="w-4 h-4" /> */}
                     {/* <span>${(task.budget / 1000000).toFixed(1)}M budget</span> */}
-                    <span>Budget:</span>
+                    {/* <span>Budget:</span>
                     <span className="font-medium text-foreground"> {formatCurrency(task?.budget)} </span>
-                  </div>
+                  </div> */}
                    <div className="flex items-center gap-2 text-muted-foreground">
                     <ReceiptIndianRupee className="w-4 h-4" />
                     <span>Expenditure:</span>
                     <span className="font-medium text-foreground">{formatCurrency(task?.expense)}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-muted-foreground">
+                  {/* <div className="flex items-center gap-2 text-muted-foreground">
                     <ReceiptIndianRupee className="w-4 h-4" />
                     <span>Budget Balance:</span>
                     <span className="font-medium text-foreground">{formatCurrency(task?.totalBalance)}</span>
-                  </div>
+                  </div> */}
                       {/* Budget Progress */}
-                  <div className="space-y-2">
+                  {/* <div className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Budget Used</span>
                       <span className="font-medium">
@@ -628,7 +628,7 @@ const clearFilter = (filterKey) => {
                     </div>
                    
                      <Progress spent={task?.expense} budget={task?.budget} mode="budget" className="h-2" />
-                  </div>
+                  </div> */}
                 </div>
 
                 {/* Client */}
