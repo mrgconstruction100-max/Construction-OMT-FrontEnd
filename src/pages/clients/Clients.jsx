@@ -333,25 +333,7 @@ const locations = unique(allClients.map((m) => m?.role));
         {/* Projects Grid */}
         {view === 'card' &&
         <>
-        {/* Stats Cards */}
-      
-        {/* <div  className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {stats.map((stat,index)=>(
-          <StatsCard key={index}
-            title={stat.title}
-            value={stat.count}
-            description={stat.description}
-            icon={<stat.icon className="w-5 h-5" />}
-           
-          />
-        ))}
-     
-         
-       </div> */}
-          
-        
-        
-      
+ 
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
           
           {clientsData.filter(client => {
@@ -398,7 +380,7 @@ const locations = unique(allClients.map((m) => m?.role));
               <div className="space-y-3 text-sm">
                 <div className="flex items-center gap-2">
                   <Mail className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground break-all">{client?.personalEmail}</span>
+                  <span className="text-muted-foreground break-all">{client?.email}</span>
                 </div>
                 
                 <div className="flex items-center gap-2">
@@ -406,15 +388,7 @@ const locations = unique(allClients.map((m) => m?.role));
                   <span className="text-muted-foreground">{client?.phone}</span>
                 </div>
 
-                {/* <div className="flex items-center gap-2">
-                  <Briefcase className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">
-                    {client.activeProjects === 0 
-                      ? "Not assigned to any projects" 
-                      : `Working on ${client?.activeProjects} project${client?.activeProjects > 1 ? 's' : ''}`
-                    }
-                  </span>
-                </div> */}
+             
               </div>
 
               {/* Action Buttons */}

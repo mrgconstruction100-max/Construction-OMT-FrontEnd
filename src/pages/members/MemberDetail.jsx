@@ -79,11 +79,18 @@ export default function MemberDetail() {
   {
     accessorKey: 'endDate',
     header: 'End Date',
-    cell: info => new Date(info.getValue()).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    }),
+   cell: info => {
+      const val = info.getValue();
+      if (!val) return "N/A";
+      const d = new Date(val);
+   
+      if (isNaN(d.getTime())) return "N/A";
+      return d.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+  }
   },
  
   
@@ -122,7 +129,7 @@ export default function MemberDetail() {
 ]
   const { id } = useParams();
   const navigate = useNavigate();
-  const { memberContext,setMemberContext,projectContext,taskContext,expenseContext } = useData();
+  const { memberContext,setMemberContext,projectContext,taskContext} = useData();
  const [member,setMember] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [editingMember, setEditMember] = useState(null);
@@ -148,27 +155,9 @@ export default function MemberDetail() {
   }
     setMember( updatedMember);
     const filteredTasks = taskContext.filter((task)=> task.assignedTo?.some(member => String(member._id) === String(updatedMember._id)))
-    const updatedTasks = filteredTasks.map((task) => {
-      const expenseTasks = expenseContext.filter(
-        (expense) => String(expense.taskId?._id) === String(task._id)
-      );
-
-      const totalExpense = expenseTasks.reduce(
-        (sum, expense) => sum + (expense?.amount || 0),
-        0
-      );
-      const totalBalance = task.budget-totalExpense;
-      
-      return {
-        ...task,
-        expense: totalExpense,
-        totalBalance
-      };
-    });
-
-
-    setTasks(updatedTasks);
-  },[memberContext,taskContext,expenseContext])
+    
+    setTasks(filteredTasks);
+  },[memberContext,taskContext])
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
@@ -183,13 +172,15 @@ export default function MemberDetail() {
 
  
   const  formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    })
+    if (!dateString) return "N/A";
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return "N/A";
+      return date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        })
   }
-
     //  Open Edit Modal
   const handleEdit = (member) => {
     setEditMember(member); // force new reference
@@ -207,7 +198,7 @@ export default function MemberDetail() {
   const handleDeleteClick = (id) => {
       setConfirmDialog({ open: true, memberId: id })
     }
-     //  Delete Task (Backend)
+     //  Delete Member (Backend)
        const handleDelete =async () => {
         const id = confirmDialog.memberId
          setConfirmDialog({ open: false, memberId: null })
@@ -397,34 +388,11 @@ export default function MemberDetail() {
                   
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Users className="w-4 h-4" />
-                    <span className="font-medium text-foreground">{task?.teamSize} team members</span>
+                    <span className="font-medium text-foreground">{task.assignedTo?.map((m) => (
+                    <Badge key={m._id}  style={{ cursor: "pointer" }} onClick={()=>navigate(`/member/${m?._id}`)}> {m.name}</Badge>
+              ))}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <ReceiptIndianRupee className="w-4 h-4" />
-                    
-                    <span>Budget:</span>
-                    <span className="font-medium text-foreground"> {formatCurrency(task?.budget)} </span>
-                  </div>
-                   <div className="flex items-center gap-2 text-muted-foreground">
-                    <ReceiptIndianRupee className="w-4 h-4" />
-                    <span>Expenditure:</span>
-                    <span className="font-medium text-foreground">{formatCurrency(task?.expense)}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <ReceiptIndianRupee className="w-4 h-4" />
-                    <span>Budget Balance:</span>
-                    <span className="font-medium text-foreground">{formatCurrency(task?.totalBalance)}</span>
-                  </div>
-                      {/* Budget Progress */}
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Budget Used</span>
-                      <span className="font-medium">
-                        {formatCurrency(task?.expense)} / {formatCurrency(task?.budget)}
-                      </span>
-                    </div>
-                     <Progress spent={task?.expense} budget={task?.budget} mode="budget" className="h-2" />
-                  </div>
+                  
                 </div>
 
               

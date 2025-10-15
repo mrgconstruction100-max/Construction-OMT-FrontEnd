@@ -276,7 +276,7 @@ export default function Phases() {
        try{
           
           const filteredTasks = taskContext.filter((task) => String(task.phaseId._id) === String(id) );
-          
+           const filteredExpense = expenseContext.filter((expense) => String(expense.phaseId._id) === String(id) );
           if(filteredTasks.length>0){
                setInfoDialog({
                   open: true,
@@ -285,6 +285,15 @@ export default function Phases() {
                 });
             return;
           }
+          if(filteredExpense.length>0){
+               setInfoDialog({
+                  open: true,
+                  type: "error",
+                  message: "This Phase contains expense. You can't delete it.",
+                });
+            return;
+          }
+         
            await API.delete(`/phase/${id}`);
             setPhases(phases.filter(phase => phase._id !== id));
             setAllPhases(allPhases.filter(phase => phase._id !== id));

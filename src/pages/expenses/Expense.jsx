@@ -77,15 +77,7 @@ function Expense() {
       return formatCurrency(amount) || 'N/A'; // ✅ Display task name instead of object
     },
   },
-  
-  {
-    accessorKey: 'taskId',
-    header: 'Task ',
-    cell: info => {
-      const task = info.getValue();
-      return task?.name || 'N/A'; // ✅ Display task name instead of object
-    },
-  },
+
   {
     accessorKey: 'phaseId',
     header: 'Phase ',
@@ -136,13 +128,12 @@ function Expense() {
   const [expenses, setExpenses] = useState([]);
   const [allExpenses,setAllExpenses] = useState([]);
   const [totalExpense,setTotalExpense] = useState(0);
-  const {expenseContext,setExpenseContext,projectContext,phaseContext,taskContext} = useData();
+  const {expenseContext,setExpenseContext,projectContext,phaseContext} = useData();
   const [globalFilter, setGlobalFilter] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingExpense, setEditExpense] = useState(null);
    const [projectOptions,setProjectOptions]= useState([]);
   const [phaseOptions,setPhaseOptions] =useState([]);
-  const [taskOptions,setTaskOptions] =useState([]);
   const [infoDialog, setInfoDialog] = useState({ open: false, type: "", message: "" });
   const [confirmDialog, setConfirmDialog] = useState({ open: false, expenseId: null });
   const [activeFilters, setActiveFilters] = useState({}); //for to show the which filter is applied
@@ -173,24 +164,19 @@ const fetchOptions =() =>{
         label:phase.name,
       })
       ))
-      setTaskOptions(taskContext.map(task=>({
-      value:task._id,
-      label:task.name,
-    })))
+    
     }
    // ✅ Add Task (Backend) +Local state
   const handleAddExpense = async (expenseData) => {
    try {
       const project = projectOptions.find(p=>p.value ===expenseData.projectId);
       const phase = phaseOptions.find(ph=>ph.value===expenseData.phaseId);
-      const task = taskOptions.find(t=>t.value===expenseData.taskId);
+     
       const newExpense = {
         ...expenseData,
         projectId:{_id:expenseData?.projectId,name:project?.label || ''},
         phaseId:{_id:expenseData?.phaseId,name:phase?.label || ''},
-        taskId:{_id:expenseData?.taskId,name:task?.label || ''},
-        
-    
+       
       }
       setExpenses(prev => [...prev, newExpense]);
       setAllExpenses(prev => [...prev, newExpense]);
@@ -204,24 +190,22 @@ const fetchOptions =() =>{
      
      const project = projectOptions.find(p=>p.value ===updated.projectId);
       const phase = phaseOptions.find(ph=>ph.value===updated.phaseId);
-      const task = taskOptions.find(t=>t.value===updated.taskId);
+    
       const updatedExpense = {
         ...updated,
         projectId:{_id:updated?.projectId,name:project?.label || ''},
         phaseId:{_id:updated?.phaseId,name:phase?.label || ''},
-        taskId:{_id:updated?.taskId,name:task?.label || ''},
-        
-    
+       
       }
 
      setExpenses(prev =>
-      prev.map((task) => task._id === updated._id ? updatedExpense : task)
+      prev.map((e) => e._id === updated._id ? updatedExpense : e)
     );
     setAllExpenses(prev =>
-      prev.map((task) => task._id === updated._id ? updatedExpense :task)
+      prev.map((e) => e._id === updated._id ? updatedExpense :e)
     );
     setExpenseContext(prev =>
-      prev.map((task) => task._id === updated._id ? updatedExpense : task)
+      prev.map((e) => e._id === updated._id ? updatedExpense : e)
     );
     setEditExpense(null);
     setShowModal(false);
@@ -289,12 +273,6 @@ const fetchOptions =() =>{
             (p) => p.phaseId.name === filters.phase
           );
           newActiveFilters.phase = filters.phase;
-        }
-        if (filters.task) {
-          filtered = filtered.filter(
-            (p) => p.taskId.name === filters.task
-          );
-          newActiveFilters.task = filters.task;
         }
          if (filters.paymentMethod) {
             filtered = filtered.filter(
@@ -381,11 +359,8 @@ const category = unique(allExpenses.map((e) => e?.category));
                   
                     <FilterComp
                       fields={[
-                        // { name: "startDate", label: "Date From", type: "startDate" },
-                        // { name: "endDate", label: "Date To", type: "endDate" },
                         { name: "project", label: "Project", type: "select", options: projectOptions.map((p) => p.label) },
-                        { name: "phase", label: "Phase", type: "select", options: phaseOptions.map((ph) => ph.label) },
-                         { name: "task", label: "Task", type: "select", options: taskOptions.map((t) => t.label) },
+                        { name: "phase", label: "Phase", type: "select", options: phaseOptions.map((ph) => ph.label) },                 
                         { name: "paymentMethod", label: "Payment Method", type: "select", options: ["Cash", "GPay", "Others"] },
                         { name: "category", label: "Category", type: "multiselect", options: category},
                         

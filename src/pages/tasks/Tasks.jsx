@@ -172,7 +172,7 @@ export default function Tasks() {
    const [projectOptions,setProjectOptions]= useState([]);
   const [phaseOptions,setPhaseOptions] =useState([]);
   const [memberOptions,setMemberOptions] =useState([]);
-  const {taskContext,memberContext,projectContext,setTaskContext,phaseContext,expenseContext} = useData();
+  const {taskContext,memberContext,projectContext,setTaskContext,phaseContext} = useData();
   const [infoDialog, setInfoDialog] = useState({ open: false, type: "", message: "" });
   const [confirmDialog, setConfirmDialog] = useState({ open: false, taskId: null });
   const [activeFilters, setActiveFilters] = useState({}); //for to show the which filter is applied
@@ -183,30 +183,12 @@ export default function Tasks() {
     };
 
     useEffect(() => {
-  
-    const updatedTasks = taskContext.map((task) => {
-      const expenseTasks = expenseContext.filter(
-        (expense) => String(expense.taskId?._id) === String(task._id)
-      );
 
-      const totalExpense = expenseTasks.reduce(
-        (sum, expense) => sum + (expense?.amount || 0),
-        0
-      );
-      const totalBalance = task.budget-totalExpense;
-
-      return {
-        ...task,
-        expense: totalExpense,
-        totalBalance
-      };
-    });
-
-    setTasks(updatedTasks);
-     setAllTasks(updatedTasks);
+    setTasks(taskContext);
+     setAllTasks(taskContext);
       fetchOptions();
   }
-, [expenseContext, taskContext]);
+, [ taskContext]);
 
     
 
@@ -293,19 +275,7 @@ export default function Tasks() {
       const id = confirmDialog.taskId
        setConfirmDialog({ open: false, taskId: null })
        try{
-          
-          const filteredTasks = expenseContext.filter((expense) => String(expense.taskId._id) === String(id) );
-          if(filteredTasks.length>0){
-               setInfoDialog({
-                  open: true,
-                  type: "error",
-                  message: "This Task is used for creating expense. You can't delete it.",
-                });
-            return;
-          }
          
-          
-            
             await API.delete(`/task/${id}`);
             setTasks(tasks.filter(task =>task._id !== id));
             setAllTasks(allTasks.filter(task => task._id !== id));
@@ -602,33 +572,7 @@ const clearFilter = (filterKey) => {
               ))}</span>
                   </div>
                   
-                  {/* <div className="flex items-center gap-2 text-muted-foreground">
-                    <ReceiptIndianRupee className="w-4 h-4" /> */}
-                    {/* <span>${(task.budget / 1000000).toFixed(1)}M budget</span> */}
-                    {/* <span>Budget:</span>
-                    <span className="font-medium text-foreground"> {formatCurrency(task?.budget)} </span>
-                  </div> */}
-                   <div className="flex items-center gap-2 text-muted-foreground">
-                    <ReceiptIndianRupee className="w-4 h-4" />
-                    <span>Expenditure:</span>
-                    <span className="font-medium text-foreground">{formatCurrency(task?.expense)}</span>
-                  </div>
-                  {/* <div className="flex items-center gap-2 text-muted-foreground">
-                    <ReceiptIndianRupee className="w-4 h-4" />
-                    <span>Budget Balance:</span>
-                    <span className="font-medium text-foreground">{formatCurrency(task?.totalBalance)}</span>
-                  </div> */}
-                      {/* Budget Progress */}
-                  {/* <div className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Budget Used</span>
-                      <span className="font-medium">
-                        {formatCurrency(task?.expense)} / {formatCurrency(task?.budget)}
-                      </span>
-                    </div>
-                   
-                     <Progress spent={task?.expense} budget={task?.budget} mode="budget" className="h-2" />
-                  </div> */}
+                 
                 </div>
 
                 {/* Client */}

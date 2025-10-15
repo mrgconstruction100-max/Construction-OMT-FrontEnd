@@ -143,7 +143,7 @@ const renderActivityDetails = (activity) => {
     case "TASK": return <>Task <span className="font-semibold">{meta?.name}</span> created under phase  <span className="font-medium text-primary">{meta?.phaseName}</span>{meta?.memberNames?.length > 0 && <> and assigned to <span className="font-medium text-secondary">{meta.memberNames.join(", ")}</span></>}.</>;
     case "MEMBER": return <>New member <span className="font-semibold">{meta?.name}</span> joined the team.</>;
     case "CLIENT": return <>New client <span className="font-semibold">{meta?.name}</span> created.</>;
-    case "EXPENSE": return <>Expense of <span className="font-semibold text-red-600">₹{meta?.amount}</span> added to task <span className="font-medium text-primary">{meta?.taskName}</span>.</>;
+    case "EXPENSE": return <>Expense of <span className="font-semibold text-red-600">₹{meta?.amount}</span> added to phase <span className="font-medium text-primary">{meta?.phaseName}</span>.</>;
     case "INCOME": return <>Income of <span className="font-semibold text-green-600">₹{meta?.amount}</span> added to project <span className="font-medium text-primary">{meta?.projectName}</span>.</>;
     case "USER": return <>New user account created for <span className="font-semibold">{meta?.memberName}</span>.</>;
     default: return <span>{JSON.stringify(meta)}</span>;

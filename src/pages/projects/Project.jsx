@@ -251,7 +251,7 @@ export default function Projects() {
     setProjects(updatedProjects);
     setAllProjects(updatedProjects);
   
-}, [projectContext, phaseContext, taskContext,memberContext,clientContext]);
+}, [projectContext, phaseContext, taskContext,memberContext,clientContext,expenseContext]);
 
     const fetchOptions = ()=>{
       setMemberOptions(memberContext.map(member=>({

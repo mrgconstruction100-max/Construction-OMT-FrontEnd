@@ -130,13 +130,12 @@ function Income() {
   const [incomes, setIncomes] = useState([]);
   const [allIncomes,setAllIncomes] = useState([]);
   const [totalIncome, setTotalIncome] = useState(0);
-  const {incomeContext,setIncomeContext,projectContext,phaseContext,taskContext} = useData();
+  const {incomeContext,setIncomeContext,projectContext,phaseContext} = useData();
   const [globalFilter, setGlobalFilter] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingIncome, setEditIncome] = useState(null);
    const [projectOptions,setProjectOptions]= useState([]);
   const [phaseOptions,setPhaseOptions] =useState([]);
-  const [taskOptions,setTaskOptions] =useState([]);
   const [infoDialog, setInfoDialog] = useState({ open: false, type: "", message: "" });
   const [confirmDialog, setConfirmDialog] = useState({ open: false, incomeId: null });
   const [activeFilters, setActiveFilters] = useState({}); //for to show the which filter is applied

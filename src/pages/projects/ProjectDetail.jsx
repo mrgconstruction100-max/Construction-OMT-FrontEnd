@@ -165,14 +165,6 @@ const expenseColumns =[
   },
   
   {
-    accessorKey: 'taskId',
-    header: 'Task ',
-    cell: info => {
-      const task = info.getValue();
-      return task?.name || 'N/A'; // ✅ Display task name instead of object
-    },
-  },
-  {
     accessorKey: 'phaseId',
     header: 'Phase ',
     cell: info => {
@@ -325,7 +317,7 @@ const expenseColumns =[
         0
       );
       const totalBalance = task.budget-totalExpense;
-      const pending = task.budget-revenue;
+      
 
       return {
         ...task,
@@ -600,15 +592,6 @@ const handleAddPhase = async (phaseData) => {
   const id = confirmTaskDialog.taskId;
   setConfirmTaskDialog({ open: false, taskId: null });
   try {
-     const filteredTasks = expenseContext.filter((expense) => String(expense.taskId._id) === String(id) );
-          if(filteredTasks.length>0){
-               setInfoDialog({
-                  open: true,
-                  type: "error",
-                  message: "This Task is used for creating expense. You can't delete it.",
-                });
-            return;
-          }
     await API.delete(`/task/${id}`);
 
     setTaskContext(prev => prev.filter(t => t._id !== id));
@@ -702,14 +685,12 @@ const handleAddPhase = async (phaseData) => {
    try {
       const project = projectOptions.find(p=>p.value ===expenseData.projectId);
       const phase = phaseOptions.find(ph=>ph.value===expenseData.phaseId);
-      const task = taskOptions.find(t=>t.value===expenseData.taskId);
+     
       const newExpense = {
         ...expenseData,
         projectId:{_id:expenseData?.projectId,name:project?.label || ''},
         phaseId:{_id:expenseData?.phaseId,name:phase?.label || ''},
-        taskId:{_id:expenseData?.taskId,name:task?.label || ''},
-        
-    
+      
       }
       setExpenses(prev => [...prev, newExpense]);
       setExpenseContext(prev=>[...prev,newExpense]);
@@ -722,17 +703,15 @@ const handleAddPhase = async (phaseData) => {
      
      const project = projectOptions.find(p=>p.value ===updated.projectId);
       const phase = phaseOptions.find(ph=>ph.value===updated.phaseId);
-      const task = taskOptions.find(t=>t.value===updated.taskId);
+     
       const updatedExpense = {
         ...updated,
         projectId:{_id:updated?.projectId,name:project?.label || ''},
         phaseId:{_id:updated?.phaseId,name:phase?.label || ''},
-        taskId:{_id:updated?.taskId,name:task?.label || ''},
-        
-    
+      
       }
      setExpenses(prev =>
-      prev.map((task) => task._id === updated._id ? updatedExpense : task)
+      prev.map((expense) => expense._id === updated._id ? updatedExpense : expense)
     );
     setExpenseContext(prev =>
       prev.map((expense) => expense._id === updated._id ? updatedExpense : expense)
@@ -1064,38 +1043,12 @@ const handleform = (type , phase = null , project=null)=>{
                     <span className="font-medium text-foreground">{formatDate(task?.startDate)} - {formatDate(task?.endDate)}</span>
                   </div>
 
-                  {/* <div className="flex items-center gap-2 text-muted-foreground">
-                    <ReceiptIndianRupee className="w-4 h-4" />
-                    
-                    <span>Budget:</span>
-                    <span className="font-medium text-foreground"> {formatCurrency(task?.budget)} </span>
-                  </div> */}
                    <div className="flex items-center gap-2 text-muted-foreground">
                     <Users className="w-4 h-4" />
                     <span className="font-medium text-foreground">{task.assignedTo?.map((m) => (
                     <Badge key={m._id}  style={{ cursor: "pointer" }} onClick={()=>navigate(`/member/${m?._id}`)}>{m.name}</Badge>
               ))}</span>
                   </div>
-                   <div className="flex items-center gap-2 text-muted-foreground">
-                    <ReceiptIndianRupee className="w-4 h-4" />
-                    <span>Expenditure:</span>
-                    <span className="font-medium text-foreground">{formatCurrency(task?.expense)}</span>
-                  </div>
-                  {/* <div className="flex items-center gap-2 text-muted-foreground">
-                    <ReceiptIndianRupee className="w-4 h-4" />
-                    <span>Budget Balance:</span>
-                    <span className="font-medium text-foreground">{formatCurrency(task?.totalBalance)}</span>
-                  </div> */}
-                      {/* Budget Progress */}
-                  {/* <div className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Budget Used</span>
-                      <span className="font-medium">
-                        {formatCurrency(task?.expense)} / {formatCurrency(task?.budget)}
-                      </span>
-                    </div>
-                    <Progress spent={task?.expense} budget={task?.budget} mode="budget" className="h-2" />
-                  </div> */}
                 </div>
               </CardContent>
             </Card>

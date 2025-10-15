@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import AddPhases from "@/components/models/AddPhases";
 import AddTasks from "@/components/models/AddTask";
 import ViewToggleSwitch from "@/components/Toggle/ViewToggleSwitch";
-import AddIncome from '@/components/models/AddIncome';
+import AddExpense from '@/components/models/AddExpense';
 import { StatsCard } from "@/components/dashboard/StatsCard";
 import {
   AlertDialog,
@@ -102,11 +102,18 @@ export default function PhaseDetail() {
   {
     accessorKey: 'endDate',
     header: 'End Date',
-    cell: info => new Date(info.getValue()).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    }),
+    cell: info =>
+      { const val = info.getValue();
+      if (!val) return "N/A";
+      const d = new Date(val);
+      // Optionally check for invalid date if your backend can store "invalid" strings
+      if (isNaN(d.getTime())) return "N/A";
+      return d.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    }
   },
  
   
@@ -144,9 +151,7 @@ export default function PhaseDetail() {
   },
 ]
 
-//Income Table Column
-
- const incomeColumns =[
+const expenseColumns =[
    {
     id: "actions",
     header: "Actions",
@@ -157,8 +162,8 @@ export default function PhaseDetail() {
           variant="default"
           onClick={(e) => {
             e.stopPropagation(); // prevent row click navigation
-            setEditIncome(row.original); // pass whole row data
-            setShowIncomeModal(true);
+            setEditExpense(row.original); // pass whole row data
+            setShowExpenseModal(true);
           }}
         >
           <Edit className="w-4 h-4" />
@@ -168,7 +173,7 @@ export default function PhaseDetail() {
           variant="destructive"
           onClick={(e) => {
             e.stopPropagation();
-            setConfirmIncomeDialog({ open: true, incomeId:row.original._id });
+            setConfirmExpenseDialog({ open: true, expenseId: row.original._id });
           }}
         >
           <Trash2 className="w-4 h-4" />
@@ -178,12 +183,12 @@ export default function PhaseDetail() {
   },
    {
     accessorKey: 'customId',
-    header: 'Income ID',
+    header: 'Expense ID',
   },
   {
     accessorKey: 'name',
-    header: 'Income ',
-    cell: info => info.getValue()?.toString().slice(0, 20) || '-', // truncate if long
+    header: 'Expense ',
+    cell: info => info.getValue()?.toString().slice(0, 50) || '-', // truncate if long
   },
     {
     accessorKey: 'amount',
@@ -215,26 +220,40 @@ export default function PhaseDetail() {
   {
     accessorKey: 'paymentDate',
     header: 'Payment Date',
-    cell: info => new Date(info.getValue() ).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    }),
+    cell: info => {
+      const val = info.getValue();
+      if (!val) return "N/A";
+      const d = new Date(val);
+   
+      if (isNaN(d.getTime())) return "N/A";
+      return d.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+  }
   },
   {
     accessorKey: 'paymentMethod',
     header: 'Payment Method',
     
   },
-   {
-    accessorKey: 'transactionNo',
-    header: 'Reference No',
-    cell: info => info.getValue()?.toString().slice(0, 20) || '-', // truncate if long
+ 
+  {
+    accessorKey: 'paidTo',
+    header: 'Paid To',
+   
+  },
+  {
+    accessorKey: 'category',
+    header: 'Category',
+   
   },
 ]
+
   const { id } = useParams();
   const navigate = useNavigate();
-  const { taskContext,setTaskContext,setPhaseContext,memberContext,expenseContext,incomeContext,setIncomeContext,projectContext,phaseContext } = useData();
+  const { taskContext,setTaskContext,setPhaseContext,memberContext,expenseContext,setExpenseContext,projectContext,phaseContext } = useData();
   const [phase,setPhase] = useState('');
   const [globalFilter, setGlobalFilter] = useState('');
   const [projectOptions,setProjectOptions]= useState([]);
@@ -245,13 +264,13 @@ export default function PhaseDetail() {
   const [editingPhase, setEditPhase] = useState(null);
   const [infoDialog, setInfoDialog] = useState({ open: false, type: "", message: "" });
   const [confirmDialog, setConfirmDialog] = useState({ open: false, phaseId: null });
-  const [confirmIncomeDialog, setConfirmIncomeDialog] = useState({ open: false, incomeId: null });
+  const [confirmExpenseDialog, setConfirmExpenseDialog] = useState({ open: false, expenseId: null });
   const [confirmTaskDialog, setConfirmTaskDialog] = useState({ open: false, incomeId: null });
 
-  //Income
-    const [incomes,setIncomes] = useState([]);
-     const [showIncomeModal, setShowIncomeModal] = useState(false);
-     const [editingIncome, setEditIncome] = useState(null);
+  //EXPENSE
+    const [expenses,setExpenses] = useState([]);
+     const [showExpenseModal, setShowExpenseModal] = useState(false);
+     const [editingExpense, setEditExpense] = useState(null);
   //Tasks
 
   const [allTasks,setAllTasks] = useState([]); // all data
@@ -272,24 +291,14 @@ export default function PhaseDetail() {
      const expensePhase = expenseContext.filter(
         (expense) => String(expense.phaseId?._id) === String(updatedPhase?._id)
       );
-       const incomePhase = incomeContext.filter(
-        (income) => String(income?.phaseId?._id) === String(updatedPhase?._id)
-      );
-      const revenue = incomePhase.reduce(
-        (sum, income) => sum + (income?.amount || 0),
-        0
-      );
+      
       const totalExpense = expensePhase.reduce(
         (sum, expense) => sum + (expense?.amount || 0),
         0
       );
-      //  const totalBudget = filteredTasks.reduce(
-      //   (sum, task) => sum + (task?.budget || 0),
-      //   0
-      // );
+   
       const totalBalance = updatedPhase?.budget-totalExpense;
-      const pending = updatedPhase?.budget-revenue;
-     
+      
       const completedTasks =filteredTasks.filter(task=> String(task?.status)==="Completed");
       let progress=0;
        if (filteredTasks.length > 0) {
@@ -304,39 +313,16 @@ export default function PhaseDetail() {
        budgetBalance:totalBalance,
        expense:totalExpense,
        progress,
-       revenue,
-       pending,
        completedTasks
 
     })
 
-    // For Tasks
-    
-    const updatedTasks = filteredTasks.map((task) => {
-      const expenseTasks = expenseContext.filter(
-        (expense) => String(expense.taskId?._id) === String(task._id)
-      );
 
-      const totalExpense = expenseTasks.reduce(
-        (sum, expense) => sum + (expense?.amount || 0),
-        0
-      );
-      const totalBalance = task.budget-totalExpense;
-      const pending = task.budget-revenue;
-
-      return {
-        ...task,
-        expense: totalExpense,
-        totalBalance
-      };
-    });
-
-
-    setTasks(updatedTasks);
-     setAllTasks(updatedTasks);
-    setIncomes(incomePhase);
+    setTasks(filteredTasks);
+     setAllTasks(filteredTasks);
+    setExpenses(expensePhase);
      fetchOptions();
-  },[phaseContext,expenseContext,taskContext,memberContext,projectContext,incomeContext])
+  },[phaseContext,expenseContext,taskContext,memberContext,projectContext])
   
 
    const fetchOptions =() =>{
@@ -370,6 +356,9 @@ export default function PhaseDetail() {
   }
  const handleRowClick = (row) => {
         navigate(`/task/${row._id}`);
+    };
+    const handleExpenseRowClick = (row) => {
+        navigate(`/expense/${row._id}`);
     };
   const  formatDate = (dateString) => {
   if (!dateString) return "N/A";
@@ -413,7 +402,8 @@ export default function PhaseDetail() {
        setConfirmDialog({ open: false, phaseId: null })
        try{
           
-          const filteredTasks = taskContext.filter((task) => String(task.phaseId._id) === String(id) );
+                const filteredTasks = taskContext.filter((task) => String(task.phaseId._id) === String(id) );
+           const filteredExpense = expenseContext.filter((expense) => String(expense.phaseId._id) === String(id) );
           if(filteredTasks.length>0){
                setInfoDialog({
                   open: true,
@@ -422,9 +412,15 @@ export default function PhaseDetail() {
                 });
             return;
           }
-         
-          
-            
+          if(filteredExpense.length>0){
+               setInfoDialog({
+                  open: true,
+                  type: "error",
+                  message: "This Phase contains expense. You can't delete it.",
+                });
+            return;
+          }
+               
             await API.delete(`/phase/${id}`);
            
             setPhaseContext(prev => prev.filter(phase=> phase._id !== id));
@@ -505,15 +501,7 @@ export default function PhaseDetail() {
   const id = confirmTaskDialog.taskId;
   setConfirmTaskDialog({ open: false, taskId: null });
   try {
-     const filteredTasks = expenseContext.filter((expense) => String(expense.taskId._id) === String(id) );
-          if(filteredTasks.length>0){
-               setInfoDialog({
-                  open: true,
-                  type: "error",
-                  message: "This Task is used for creating expense. You can't delete it.",
-                });
-            return;
-          }
+    
     await API.delete(`/task/${id}`);
 
     setTaskContext(prev => prev.filter(t => t._id !== id));
@@ -534,87 +522,86 @@ export default function PhaseDetail() {
     });
   }
 };
-  const handleform = (type , phase = null , project=null)=>{
+ // Function for handle different forms
+const handleform = (type , phase = null , project=null)=>{
       if (type === 'task') {
         setEditTask(null);
         setSelectedProject(project);
         setSelectedPhase(phase);
         setShowTaskModal(true);
       }
-        
-      if (type === 'income') {
-        setEditIncome(null); // ✅ Clear old edit state
+  if (type === 'expense') {
+        setEditExpense(null); // ✅ Clear old edit state
         setSelectedProject(project); // Set selected project
         setSelectedPhase(phase);
-        setShowIncomeModal(true);
+        setShowExpenseModal(true);
   }
 }
 
-/***************INCOME ****************/
- const handleAddIncome = async (incomeData) => {
+/***************EXPENSE ****************/
+ // ✅ Add Expense (Backend) +Local state
+  const handleAddExpense = async (expenseData) => {
    try {
-       const project = projectOptions.find(p=>p.value ===incomeData.projectId);
-      const phase = phaseOptions.find(ph=>ph.value===incomeData.phaseId);
-      const newIncome = {
-        ...incomeData,
-        projectId:{_id:incomeData?.projectId,name:project?.label || ''},
-        phaseId:{_id:incomeData?.phaseId,name:phase?.label || ''},
+      const project = projectOptions.find(p=>p.value ===expenseData.projectId);
+      const phase = phaseOptions.find(ph=>ph.value===expenseData.phaseId);
+     
+      const newExpense = {
+        ...expenseData,
+        projectId:{_id:expenseData?.projectId,name:project?.label || ''},
+        phaseId:{_id:expenseData?.phaseId,name:phase?.label || ''},
     
       }
-      setIncomes(prev => [...prev, newIncome]);
-      setIncomeContext(prev=>[...prev,newIncome]);
+      setExpenses(prev => [...prev, newExpense]);
+      setExpenseContext(prev=>[...prev,newExpense]);
     } catch (error) {
-       console.error("Error adding Income:", error);
+      console.error("Error adding Expense:", error);
     }
   };
 
-  const handleEditIncome = async(updated) => {
+  const handleEditExpense = async(updated) => {
      
      const project = projectOptions.find(p=>p.value ===updated.projectId);
       const phase = phaseOptions.find(ph=>ph.value===updated.phaseId);
-      const updatedIncome = {
+    
+      const updatedExpense = {
         ...updated,
         projectId:{_id:updated?.projectId,name:project?.label || ''},
         phaseId:{_id:updated?.phaseId,name:phase?.label || ''},
-        
+      
     
       }
-
-     setIncomes(prev =>
-      prev.map((income) => income._id === updated._id ? updatedIncome : income)
+     setExpenses(prev =>
+      prev.map((expense) => expense._id === updated._id ? updatedExpense :expense)
     );
-    
-    setIncomeContext(prev =>
-      prev.map((income) => income._id === updated._id ? updatedIncome : income)
+    setExpenseContext(prev =>
+      prev.map((expense) => expense._id === updated._id ? updatedExpense : expense)
     );
-    setEditIncome(null);
-    setShowIncomeModal(false);
+    setEditExpense(null);
+    setShowExpenseModal(false);
   };
+   const handleDeleteExpense = async () => {
+  const id = confirmExpenseDialog.expenseId;
+  setConfirmExpenseDialog({ open: false, expenseId: null });
+  try {
+    await API.delete(`/expense/${id}`);
 
-  const handleDeleteIncome =async () => {
-      const id = confirmIncomeDialog.incomeId
-       setConfirmIncomeDialog({ open: false, incomeId: null })
-       try{
-    
-            await API.delete(`/income/${id}`);
-            setIncomes(incomes.filter(income =>income._id !== id));
-            setIncomeContext(incomeContext.filter(income =>income._id !== id));
-            setInfoDialog({
-                open: true,
-                type: "success",
-                message: "Income deleted successfully.",
-              });         
-        }
-        catch(err){
-            console.error(err);
-             setInfoDialog({
-              open: true,
-              type: "error",
-              message: "Failed to delete income.",
-            });
-            
-          }
-     }
+    setExpenseContext(prev => prev.filter(exp => exp._id !== id));
+    setExpenses(prev => prev.filter(exp => exp._id !== id));
+
+    setInfoDialog({
+      open: true,
+      type: "success",
+      message: "Expense deleted successfully.",
+    });
+  } catch (err) {
+    console.error(err);
+    setInfoDialog({
+      open: true,
+      type: "error",
+      message: "Failed to delete expense.",
+    });
+  }
+};
   if (!phase) return <p className="p-6">Phase not found</p>;
 
   return (
@@ -656,6 +643,13 @@ export default function PhaseDetail() {
             
           />
          
+         <StatsCard
+            title="Total Expense"
+            value={`₹ ${phase?.expense}`|| 0}
+            description={`for this phase`}
+            icon={<ReceiptIndianRupee className="w-5 h-5" />}
+            
+          />
           
          
         </div>
@@ -760,6 +754,30 @@ export default function PhaseDetail() {
   </Card>
   
   } */}
+  
+      {expenses.length>0?<>
+          <div className=" flex items-center justify-between">
+            <h1 className="text-2xl font-bold">Related Expenses </h1>
+            <Button onClick={() =>  handleform("expense", phase, phase.projectId)}>
+              <ReceiptIndianRupee className="w-4 h-4 mr-2" /> Add Expense
+            </Button>
+            </div>
+          <DataTable data={expenses} columns={expenseColumns} globalFilter={globalFilter}
+            onGlobalFilterChange={setGlobalFilter} onRowClick={handleExpenseRowClick}/>
+           
+          </>  :
+  
+          
+            <Card className="p-10 flex flex-col items-center justify-center text-center border-dashed border-2">
+    <ReceiptText className="w-12 h-12 text-gray-400 mb-4" />
+    <p className="text-lg font-medium text-gray-600">No expenses yet</p>
+    <p className="text-sm text-gray-500 mb-4">Start by adding your first expense for this Phase</p>
+    <Button onClick={() =>  handleform("expense", phase, phase.projectId)}>
+      <ReceiptIndianRupee className="w-4 h-4 mr-2" /> Add Expense
+    </Button>
+  </Card>
+  
+  }
 {tasks.length>0?
       <div className="space-y-6 ">
          <div className="flex items-center justify-between">
@@ -772,34 +790,16 @@ export default function PhaseDetail() {
      <div className="mt-16 space-y-6">
       {view === 'table' &&
         <>
-        
-          {/* Add the FilterStatus component */}
-              {/* Filter Status Indicator */}
-             {/* <FilterStatus 
-                activeFilters={activeFilters}
-                onClearFilter={clearFilter}
-                onClearAll={clearAllFilters}
-                filterConfig={tasksFilterConfig}
-                data-page-type="tasks"
-              /> */}
+ 
             <div>
           <DataTable data={tasks} columns={tasksColumns} globalFilter={globalFilter}
             onGlobalFilterChange={setGlobalFilter} onRowClick={handleRowClick}/>
         </div>
         </>
       }
-        {/* Projects Grid */}
+        {/* Tasks Grid */}
         {view === 'card' &&
        <>
-       
-        {/* Filter Status Indicator */}
-              {/* <FilterStatus 
-                activeFilters={activeFilters}
-                onClearFilter={clearFilter}
-                onClearAll={clearAllFilters}
-                filterConfig={tasksFilterConfig}
-                data-page-type="tasks"
-              /> */}
         
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
           {tasks.filter(task => {
@@ -852,41 +852,14 @@ export default function PhaseDetail() {
                     <span>Timeline:</span>
                     <span className="font-medium text-foreground">{formatDate(task?.startDate)} - {formatDate(task?.endDate)}</span>
                   </div>
-                  
-                  
-                  {/* <div className="flex items-center gap-2 text-muted-foreground">
-                    <ReceiptIndianRupee className="w-4 h-4" />
-                    
-                    <span>Budget:</span>
-                    <span className="font-medium text-foreground"> {formatCurrency(task?.budget)} </span>
-                  </div> */}
-                   <div className="flex items-center gap-2 text-muted-foreground">
-                    <ReceiptIndianRupee className="w-4 h-4" />
-                    <span>Expenditure:</span>
-                    <span className="font-medium text-foreground">{formatCurrency(task?.expense)}</span>
-                  </div>
+                 
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Users className="w-4 h-4" />
                     <span className="font-medium text-foreground">{task.assignedTo?.map((m) => (
                     <Badge key={m._id}  style={{ cursor: "pointer" }} onClick={()=>navigate(`/member/${m?._id}`)}>{m.name}</Badge>
               ))}</span>
                   </div>
-                  {/* <div className="flex items-center gap-2 text-muted-foreground">
-                    <ReceiptIndianRupee className="w-4 h-4" />
-                    <span>Budget Balance:</span>
-                    <span className="font-medium text-foreground">{formatCurrency(task?.totalBalance)}</span>
-                  </div> */}
-                      {/* Budget Progress */}
-                  {/* <div className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Budget Used</span>
-                      <span className="font-medium">
-                        {formatCurrency(task?.expense)} / {formatCurrency(task?.budget)}
-                      </span>
-                    </div>
-                    
-                     <Progress spent={task?.expense} budget={task?.budget} mode="budget" className="h-2" />
-                  </div> */}
+                
                 </div>
 
               
@@ -933,21 +906,20 @@ export default function PhaseDetail() {
          onEdit={handleEditTask}
          editTask={editingTask}
       />
-      <AddIncome
-        isOpen={showIncomeModal}
+      <AddExpense
+        isOpen={showExpenseModal}
         onClose={() => {
-          setShowIncomeModal(false);
-          setEditIncome(null);
-          // Clear after close
+          setShowExpenseModal(false);
+          setEditExpense(null);
             setSelectedProject(null);
-            
+            setSelectedPhase(null);
         }}
-        
-        
+       
+        selectedPhase={selectedPhase} // Pass selected task
         selectedProject={selectedProject} // Pass selected project
-        onSubmit={handleAddIncome}
-        onEdit={handleEditIncome}
-        editIncome={editingIncome}
+        onSubmit={handleAddExpense}
+         onEdit={handleEditExpense}
+         editExpense={editingExpense}
       />
       {/* Confirm Delete AlertDialog for Phase */}
                   <AlertDialog open={confirmDialog.open} onOpenChange={(open) => setConfirmDialog({ ...confirmDialog, open })}>
@@ -984,21 +956,21 @@ export default function PhaseDetail() {
                         </AlertDialogContent>
                       </AlertDialog>
 
-                      {/* Confirm Delete AlertDialog for Income */}
+                    {/* Confirm Delete AlertDialog for expense */}
                   <AlertDialog
-                        open={confirmIncomeDialog.open}
-                        onOpenChange={(open) => setConfirmIncomeDialog({ ...confirmIncomeDialog, open })}
+                        open={confirmExpenseDialog.open}
+                        onOpenChange={(open) => setConfirmExpenseDialog({ ...confirmExpenseDialog, open })}
                       >
                         <AlertDialogContent>
                           <AlertDialogHeader>
                             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                             <AlertDialogDescription>
-                              This action cannot be undone. Do you really want to delete this income?
+                              This action cannot be undone. Do you really want to delete this expense?
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={handleDeleteIncome}>Yes, Delete</AlertDialogAction>
+                            <AlertDialogAction onClick={handleDeleteExpense}>Yes, Delete</AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>

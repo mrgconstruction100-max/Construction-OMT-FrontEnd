@@ -70,11 +70,18 @@ export default function ClientDetail() {
     accessorKey: 'endDate',
     header: 'End Date',
    
-    cell: info => new Date(info.getValue()).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    }),
+   cell: info =>
+      { const val = info.getValue();
+      if (!val) return "N/A";
+      const d = new Date(val);
+      // Optionally check for invalid date if your backend can store "invalid" strings
+      if (isNaN(d.getTime())) return "N/A";
+      return d.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    }
   },
  
   
@@ -172,25 +179,31 @@ const getStatusColor = (status) => {
   }
    const filteredProjects = projectContext.filter((project)=> String(project.clientId?._id) === String(updatedClient._id))
     const updatedProjects = filteredProjects.map((project) => {
-      const projectTasks = taskContext.filter(
-        (task) => String(task.projectId?._id) === String(project._id)
+    
+       const projectTasks = taskContext.filter(
+        (task) => String(task?.projectId?._id) === String(project?._id)
       );
-     const completedTasks = projectTasks.filter(task=> String(task?.status)==="Completed");
+
+      const projectPhases = phaseContext.filter(
+        (phase) => String(phase?.projectId?._id) === String(project?._id)
+      );
+
+      const completedTasks = projectTasks.filter(task=> String(task?.status)==="Completed");
       let progress=0;
-       if (projectTasks.length > 0) {
-          progress = (completedTasks.length / projectTasks.length) * 100;
+       if (projectTasks?.length > 0) {
+          progress = (completedTasks?.length / projectTasks?.length) * 100;
         }
 
         // round to 1 decimal place
         progress = Number(progress.toFixed(1));
       const expenseProjects = expenseContext.filter(
-        (expense) => String(expense.projectId?._id) === String(project._id)
+        (expense) => String(expense?.projectId?._id) === String(project?._id)
       );
        const incomeProjects = incomeContext.filter(
-        (income) => String(income.projectId?._id) === String(project._id)
+        (income) => String(income?.projectId?._id) === String(project?._id)
       ); 
-      const totalBudget = projectTasks.reduce(
-        (sum, task) => sum + (task?.budget || 0),
+      const totalBudget = projectPhases.reduce(
+        (sum, phase) => sum + (phase?.budget || 0),
         0
       );
 
@@ -202,9 +215,9 @@ const getStatusColor = (status) => {
         (sum, income) => sum + (income?.amount || 0),
         0
       );
-      
+
       return {
-         ...project,
+        ...project,
         budget: totalBudget,
         spent,
         revenue,
@@ -216,17 +229,20 @@ const getStatusColor = (status) => {
 
 
     setProjects(updatedProjects);
-  },[clientContext,projectContext,taskContext,memberContext])
+  },[clientContext,projectContext,taskContext,memberContext,expenseContext])
   
    const handleRowClick = (row) => {
         navigate(`/project/${row._id}`);
     };
-  const  formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    })
+ const  formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return "N/A";
+      return date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        })
   }
 
     //  Open Edit Modal
@@ -375,16 +391,16 @@ const getStatusColor = (status) => {
       }
         {/* Projects Grid */}
         {view === 'card' &&
-       <>
-       
-  
+      <>
+     
         
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+          
           {projects.filter(project => {
           const search = globalFilter?.toLowerCase() || '';
           return (
             project.name?.toLowerCase().includes(search) ||
-             project._id?.toLowerCase().includes(search)
+             project.typeId?.toLowerCase().includes(search)
 
           );
         }).map((project) => (
@@ -392,24 +408,35 @@ const getStatusColor = (status) => {
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <CardTitle onClick={() => navigate(`/project/${project._id}`)} style={{ cursor: "pointer" }} className="text-lg font-semibold mb-2 group-hover:text-primary transition-smooth">
-                      {project?.name}
+                    <CardTitle className="text-lg font-semibold mb-2 group-hover:text-primary transition-smooth">
+                      {project.name}
                     </CardTitle>
-                    <Badge variant="secondary" className={getStatusColor(project?.status)}>
-                      {project?.status}
+                    <Badge variant="secondary" className={getStatusColor(project.status)}>
+                      {project.status}
                     </Badge>
                   </div>
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-smooth">
-                   
-                  </div>
-                </div>
-              </CardHeader>
               
+                </div>
+                 
+              </CardHeader>
+           
               <CardContent className="space-y-4">
-                
-                
+                <p className="text-sm text-muted-foreground line-clamp-2">
+                  {project.description}
+                </p>
+
+                {/* Progress */}
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Progress</span>
+                    <span className="font-medium">{project.progress}%</span>
+                  </div>
+                  <Progress value={project.progress}  mode="progress" className="h-2" />
+                </div>
+
+                {/* Project Details */}
                 <div className="space-y-2 text-sm">
-                  <div className="flex items-center gap-2 text-muted-foreground">
+                     <div className="flex items-center gap-2 text-muted-foreground">
                     <Tags className="w-4 h-4" />
                     <span>Project Id:</span>
                     <span className="font-medium text-foreground"> {project?.typeId}</span>
@@ -417,35 +444,37 @@ const getStatusColor = (status) => {
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Calendar className="w-4 h-4" />
                     <span>Timeline:</span>
-                    <span className="font-medium text-foreground">{formatDate(project?.startDate)} - {formatDate(project?.endDate)}</span>
+                    <span className="font-medium text-foreground">{formatDate(project.startDate)} - {formatDate(project.endDate)}</span>
                   </div>
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <MapPin className="w-4 h-4" />
-                    <span>{project?.location}</span>
+                    <span>{project.location}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-muted-foreground">
+                   <div className="flex items-center gap-2 text-muted-foreground">
                     <User className="w-4 h-4"/>
                     <span>Project Manager:</span>
                     <span className="font-medium text-foreground"> {project?.projectManager?.name} </span>
                   </div>
+                  
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <ReceiptIndianRupee className="w-4 h-4" />
-                    
                     <span>Allocated Budget:</span>
-                    <span className="font-medium text-foreground"> {formatCurrency(project?.budget)} </span>
+                    <span className="font-medium text-foreground"> {formatCurrency(project.budget)} </span>
                   </div>
-                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <div className="flex items-center gap-2 text-muted-foreground">
                     <ReceiptIndianRupee className="w-4 h-4" />
-                    {/* <span>${(phases.budget / 1000000).toFixed(1)}M budget</span> */}
+             
                     <span>Client Payments:</span>
                     <span className="font-medium text-foreground"> {formatCurrency(project?.revenue)} </span>
                   </div>
                    <div className="flex items-center gap-2 text-muted-foreground">
                     <ReceiptIndianRupee className="w-4 h-4" />
+                    
                     <span>Expenditure:</span>
-                    <span className="font-medium text-foreground">{formatCurrency(project?.spent)}</span>
+                    <span className="font-medium text-foreground"> {formatCurrency(project?.spent)} </span>
                   </div>
-                        {/* Budget Progress */}
+                 
+                      {/* Budget Progress */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Budget Used</span>
@@ -453,8 +482,7 @@ const getStatusColor = (status) => {
                         {formatCurrency(project?.spent)} / {formatCurrency(project?.budget)}
                       </span>
                     </div>
-                  
-                     <Progress spent={project?.spent} budget={project?.budget} mode="budget" className="h-2" />
+                    <Progress spent={project?.spent} budget={project?.budget} mode="budget" className="h-2" />
                   </div>
                    <div className="flex items-center gap-2 text-muted-foreground">
                     <ReceiptIndianRupee className="w-4 h-4" />
@@ -469,10 +497,10 @@ const getStatusColor = (status) => {
                         {formatCurrency(project?.spent)} / {formatCurrency(project?.revenue)}
                       </span>
                     </div>
-                    
-                    <Progress spent={project?.spent} budget={project?.revenue} mode="budget" className="h-2" />
+                   
+                     <Progress spent={project?.spent} budget={project?.revenue} mode="budget" className="h-2" />
                   </div>
-                  
+                
                    <div className="flex items-center gap-2 text-muted-foreground">
                     <ReceiptIndianRupee className="w-4 h-4" />
                     <span>Pending from Clients:</span>
@@ -480,8 +508,11 @@ const getStatusColor = (status) => {
                   </div>
                 </div>
 
-              
-             
+                {/* Client */}
+                <div className="pt-2 border-t border-muted-foreground/10">
+                  <p className="text-xs text-muted-foreground">Client</p>
+                  <p className="font-medium text-sm">{project?.clientId?.name}</p>
+                </div>
               </CardContent>
             </Card>
           ))}

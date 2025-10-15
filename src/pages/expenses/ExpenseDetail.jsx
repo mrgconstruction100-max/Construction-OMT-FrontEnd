@@ -2,7 +2,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { Calendar, Users, ReceiptIndianRupee, ArrowLeft, Edit, Trash2, Tags, ReceiptText, Layers, Building2 } from "lucide-react";
 import { useData } from "@/context/DataContext";
 import { useEffect, useState } from "react";
@@ -28,11 +27,10 @@ import AddExpense from "../../components/models/AddExpense";
 export default function ExpenseDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { expenseContext,setExpenseContext,projectContext,phaseContext,taskContext } = useData();
+  const { expenseContext,setExpenseContext,projectContext,phaseContext } = useData();
   const [expense,setExpense] = useState('');
   const [projectOptions,setProjectOptions]= useState([]);
   const [phaseOptions,setPhaseOptions] =useState([]);
-  const [taskOptions,setTaskOptions] =useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editingExpense, setEditExpense] = useState(null);
   const [infoDialog, setInfoDialog] = useState({ open: false, type: "", message: "" });
@@ -55,10 +53,7 @@ export default function ExpenseDetail() {
         label:phase.name,
       })
       ))
-      setTaskOptions(taskContext.map(task=>({
-      value:task._id,
-      label:task.name,
-    })))
+    
     } 
   const  formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -76,13 +71,11 @@ export default function ExpenseDetail() {
      
      const project = projectOptions.find(p=>p.value ===updated.projectId);
       const phase = phaseOptions.find(ph=>ph.value===updated.phaseId);
-      const task = taskOptions.find(t=>t.value===updated.taskId);
+    
       const updatedExpense = {
         ...updated,
         projectId:{_id:updated?.projectId,name:project?.label || ''},
         phaseId:{_id:updated?.phaseId,name:phase?.label || ''},
-        taskId:{_id:updated?.taskId,name:task?.label || ''},
-        
     
       }
      setExpense(updatedExpense);
@@ -135,9 +128,6 @@ export default function ExpenseDetail() {
           <Badge>{expense.paymentMethod}</Badge>
         </div>
         <div className="flex gap-2">
-          {/* <Button variant="outline" onClick={() => navigate(-1)}>
-            <ArrowLeft className="w-4 h-4 mr-2" /> Back
-          </Button> */}
           <Button className="bg-gradient-primary hover:opacity-90 transition-smooth shadow-construction flex-1 sm:flex-none"
            onClick={() => handleEdit(expense)}>
             <Edit className="w-4 h-4 mr-2" /> Edit
@@ -175,12 +165,7 @@ export default function ExpenseDetail() {
                 <Layers className="w-4 h-4"/>
          <p style={{ cursor: "pointer" }} onClick={()=>navigate(`/phase/${expense.phaseId?._id}`)}>Phase Name: {expense?.phaseId?.name}</p>
             </div>
-             <div className="flex items-center gap-2 ">
-                <Layers className="w-4 h-4"/>
-         <p style={{ cursor: "pointer" }} onClick={()=>navigate(`/task/${expense.taskId?._id}`)}>Task Name: {expense.taskId?.name}</p>
-            </div>
              
-         
             <div className="flex items-center gap-2 ">
               <Calendar className="w-4 h-4" /> 
               <span>Payment Date: {formatDate(expense?.paymentDate)} </span>
@@ -238,14 +223,7 @@ export default function ExpenseDetail() {
            <ReceiptIndianRupee className="w-4 h-4" />
            <span>Total Amount: ₹{expense?.amount}</span>
             </div>
-         
-         
-            
-         
-    
-          
 
-        
         </CardContent>
       </Card>
       <AddExpense

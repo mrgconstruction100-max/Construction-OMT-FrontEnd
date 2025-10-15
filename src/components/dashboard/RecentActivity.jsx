@@ -117,8 +117,8 @@ const renderActivityDetails = (activity) => {
       <>
         <span className="text-sm text-muted-foreground">Expense of </span>
         <span className="text-sm font-semibold text-red-600">₹ {meta?.amount}</span>
-        <span className="text-sm text-muted-foreground"> added to task </span>
-        <span className="text-sm font-medium text-primary">{meta?.taskName}</span>.
+        <span className="text-sm text-muted-foreground"> added to phase </span>
+        <span className="text-sm font-medium text-primary">{meta?.phaseName}</span>.
       </>
     );
 case "INCOME":

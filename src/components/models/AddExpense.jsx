@@ -9,7 +9,7 @@ import { useData } from '../../context/DataContext';
 
 
 
-function AddExpense({ isOpen, onClose, onSubmit, editExpense, onEdit,selectedTask,selectedProject,selectedPhase }) {
+function AddExpense({ isOpen, onClose, onSubmit, editExpense, onEdit,selectedProject,selectedPhase }) {
     const [formData,setFormData]=useState({
         name:"",
         description:"",
@@ -18,7 +18,6 @@ function AddExpense({ isOpen, onClose, onSubmit, editExpense, onEdit,selectedTas
         paidTo:"",
         projectId:"",
         phaseId:"",
-        taskId:"",
         amount:"",
         category:"",
         transactionNo:"",
@@ -33,11 +32,9 @@ function AddExpense({ isOpen, onClose, onSubmit, editExpense, onEdit,selectedTas
        
     });
     const [allPhases,setAllPhases] = useState([]);
-    const [allTasks,setAllTasks] = useState([]);
     const [projectOptions,setProjectOptions] = useState([]);
     const [phaseOptions,setPhaseOptions] = useState([]);
-    const [taskOptions,setTaskOptions] = useState([]);
-    const {projectContext,phaseContext,taskContext,expenseContext} = useData();
+    const {projectContext,phaseContext,expenseContext} = useData();
     const [errors, setErrors] = useState({});
     const [btnLoading, setBtnLoading] = useState(false);
     const [category, setCategory] = useState([]);
@@ -52,14 +49,9 @@ function AddExpense({ isOpen, onClose, onSubmit, editExpense, onEdit,selectedTas
           label:phase.name,
           projectId: phase.projectId?._id || phase.projectId,
         })));
-        setAllTasks(taskContext.map(task=>({
-            value:task._id,
-            label:task.name,
-            phaseId: task.phaseId?._id || task.phaseId,
-        })))
       
     
-   },[projectContext,phaseContext,taskContext]);
+   },[projectContext,phaseContext]);
 
    useEffect(() => {
        const uniqueCategory = [...new Set(expenseContext.map(e => e.category).filter(Boolean))];
@@ -92,32 +84,26 @@ function AddExpense({ isOpen, onClose, onSubmit, editExpense, onEdit,selectedTas
             }, [formData.category,formData.salary,formData.food,formData.miscellaneous,formData.quantity,formData.price,]);
 
    useEffect(() => {
-    if (!editExpense && !selectedProject && allTasks.length === 0) return;
+    if (!editExpense && !selectedProject) return;
       let projectFromEdit='';
       let phaseFromEdit='';
-      let taskFromEdit='';
+    
         if (editExpense) {
            projectFromEdit = editExpense?.projectId?._id || editExpense?.projectId;
            phaseFromEdit = editExpense?.phaseId?._id || editExpense?.phaseId;
-           taskFromEdit =  editExpense?.taskId?._id || editExpense?.taskId;
+           
           }
           else{
             projectFromEdit=selectedProject?._id || '';
             phaseFromEdit=selectedPhase?._id || '';
-            taskFromEdit=selectedTask?._id || '';
+           
           }  // Filter phases for the selected project
             const filteredPhases = allPhases.filter(phase => {
               const pid = typeof phase.projectId === 'object' ? phase.projectId._id : phase.projectId;
               return pid === projectFromEdit;
             });
             setPhaseOptions(filteredPhases);
-            // Filter tasks for the selected phase ✅
-            const filteredTasks = allTasks.filter(task => {
-              const tid = typeof task.phaseId === "object" ? task.phaseId._id : task.phaseId;
-              return tid === phaseFromEdit;
-            });
-            setTaskOptions(filteredTasks);
-
+           
              if (editExpense) {      
             setFormData({
               name:editExpense.name || "",
@@ -127,18 +113,18 @@ function AddExpense({ isOpen, onClose, onSubmit, editExpense, onEdit,selectedTas
               paidTo: editExpense.paidTo || "",
               projectId: projectFromEdit,
               phaseId: phaseFromEdit,
-              taskId: taskFromEdit, // ✅ was `taskContext`
               amount: editExpense.amount || "",
               category: editExpense.category || "",
               transactionNo:editExpense.transactionNo ||"",
-              workers:editExpense.workers,
-              salary:editExpense.salary,
-              food:editExpense.food,
-              quantity:editExpense.quantity,
-              price:editExpense.price,
-              miscellaneous:editExpense.miscellaneous,
-              unit:editExpense.unit,
+              workers:editExpense.workers || "",
+              salary:editExpense.salary || "",
+              food:editExpense.food || "",
+              quantity:editExpense.quantity || "",
+              price:editExpense.price || "",
+              miscellaneous:editExpense.miscellaneous || "",
+              unit:editExpense.unit || "",
             });
+            
         } else {
           setFormData({
             name:"",
@@ -148,7 +134,6 @@ function AddExpense({ isOpen, onClose, onSubmit, editExpense, onEdit,selectedTas
             paidTo:"",
             projectId:selectedProject? selectedProject._id : '',
             phaseId:selectedPhase? selectedPhase._id : '',
-            taskId:selectedTask ? selectedTask._id : '',
             amount:"",
             category:"",
             transactionNo:"",
@@ -162,14 +147,13 @@ function AddExpense({ isOpen, onClose, onSubmit, editExpense, onEdit,selectedTas
            
           });
         }
-      }, [editExpense,selectedTask, selectedProject,selectedPhase, allPhases, allTasks]);
+      }, [editExpense, selectedProject,selectedPhase, allPhases]);
 
     const validateForm = () => {
     const newErrors = {};
 
     if (!formData.name.trim()) newErrors.name = 'Expense detail is required';
     if (!formData.paymentDate) newErrors.paymentDate = 'Payment date is required';
-    if (!formData.taskId) newErrors.taskId = 'Task is required';
     if (!formData.projectId) newErrors.projectId = 'Project is required';
     if (!formData.phaseId) newErrors.phaseId = 'Phase is required';
     if (!formData.amount) newErrors.amount = 'Amount is required';
@@ -215,7 +199,6 @@ function AddExpense({ isOpen, onClose, onSubmit, editExpense, onEdit,selectedTas
                         paidTo:"",
                         projectId:"",
                         phaseId:"",
-                        taskId:"",
                         amount:"",
                         category:"",
                         transactionNo:"",
@@ -242,7 +225,6 @@ function AddExpense({ isOpen, onClose, onSubmit, editExpense, onEdit,selectedTas
               paidTo:"",
               projectId:"",
               phaseId:"",
-              taskId:"",
               amount:"",
               category:"",
               transactionNo:"",
@@ -264,29 +246,15 @@ function AddExpense({ isOpen, onClose, onSubmit, editExpense, onEdit,selectedTas
     return pid === projectId;
   });
     setPhaseOptions(filtered);
-    setTaskOptions([]); // reset tasks since phase will change
-   
+ 
     setFormData(prev => ({
       ...prev,
       projectId,
       phaseId:'',
-      taskId:"",
+
     }));
   };
-  const handlePhaseChange = (phaseId) => {
-  const filteredTasks = allTasks.filter(task => {
-    const tid = typeof task.phaseId === "object" ? task.phaseId._id : task.phaseId;
-    return tid === phaseId;
-  });
-
-  setTaskOptions(filteredTasks);
-
-  setFormData(prev => ({
-    ...prev,
-    phaseId,
-    taskId: "" // reset task when phase changes
-  }));
-};
+ 
         if (!isOpen) return null;
 
   return (
@@ -422,23 +390,13 @@ function AddExpense({ isOpen, onClose, onSubmit, editExpense, onEdit,selectedTas
                                             label="Phase Name"
                                             options={phaseOptions}
                                             value={formData.phaseId}
-                                            onChange={(value) =>handlePhaseChange(value)}
+                                            onChange={(value) => setFormData({ ...formData, phaseId: value })}
                                             searchable
                                             required
                                             error={errors.phaseId}
                                             disabled={!!selectedPhase}
                                           />
-                                          
-                                            <DropdownSelect
-                                            label="Task Name"
-                                            options={taskOptions}
-                                            value={formData.taskId}
-                                            onChange={(value) => setFormData({ ...formData, taskId: value })}
-                                            required
-                                            error={errors.taskId}
-                                            disabled={!!selectedTask}
-                                            />
-                                    
+                                 
                                          
                                         <DateSelect
                                         label="Payment Date"
