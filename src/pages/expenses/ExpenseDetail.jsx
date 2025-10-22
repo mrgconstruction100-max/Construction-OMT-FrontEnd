@@ -29,6 +29,7 @@ export default function ExpenseDetail() {
   const navigate = useNavigate();
   const { expenseContext,setExpenseContext,projectContext,phaseContext } = useData();
   const [expense,setExpense] = useState('');
+  const [expenseType,setExpenseType] = useState('');
   const [projectOptions,setProjectOptions]= useState([]);
   const [phaseOptions,setPhaseOptions] =useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -66,6 +67,7 @@ export default function ExpenseDetail() {
   const handleEdit = (expense) => {
     setEditExpense(expense); // force new reference
     setShowModal(true);
+    setExpenseType('edit');
   };
   const handleEditExpense = async(updated) => {
      
@@ -231,9 +233,11 @@ export default function ExpenseDetail() {
         onClose={() => {
           setShowModal(false);
           setEditExpense(null);
+          setExpenseType('');
         }}
          onEdit={handleEditExpense}
          editExpense={editingExpense}
+         type={expenseType}
       />
        {/* Confirm Delete AlertDialog */}
                   <AlertDialog open={confirmDialog.open} onOpenChange={(open) => setConfirmDialog({ ...confirmDialog, open })}>

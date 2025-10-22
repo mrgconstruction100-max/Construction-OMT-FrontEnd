@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useData } from '@/context/DataContext';
 
 import DataTable from '@/components/Table/DataTable';
-import { Edit, Filter, Pencil, Plus, ReceiptIndianRupee, Search, Trash2 } from 'lucide-react';
+import { Copy, Edit, Filter, Pencil, Plus, ReceiptIndianRupee, Search, Trash2 } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from '@/components/ui/button';
 import {
@@ -42,6 +42,7 @@ function Expense() {
             e.stopPropagation(); // prevent row click navigation
             setEditExpense(row.original); // pass whole row data
             setShowModal(true);
+            setExpenseType('edit');
           }}
         >
           <Edit className="w-4 h-4" />
@@ -55,6 +56,17 @@ function Expense() {
           }}
         >
           <Trash2 className="w-4 h-4" />
+        </Button>
+        <Button
+          size="icon"
+          variant="outline"
+          onClick={(e) => {
+            e.stopPropagation(); // prevent row click navigation
+            setEditExpense(row.original); // pass whole row data
+            setShowModal(true);
+          }}
+        >
+          <Copy className="w-4 h-4" />
         </Button>
       </div>
     ),
@@ -128,6 +140,7 @@ function Expense() {
   const [expenses, setExpenses] = useState([]);
   const [allExpenses,setAllExpenses] = useState([]);
   const [totalExpense,setTotalExpense] = useState(0);
+  const [expenseType,setExpenseType]= useState('');
   const {expenseContext,setExpenseContext,projectContext,phaseContext} = useData();
   const [globalFilter, setGlobalFilter] = useState('');
   const [showModal, setShowModal] = useState(false);
@@ -377,10 +390,12 @@ const category = unique(allExpenses.map((e) => e?.category));
         onClose={() => {
           setShowModal(false);
           setEditExpense(null);
+          setExpenseType('');
         }}
         onSubmit={handleAddExpense}
         onEdit={handleEditExpense}
         editExpense={editingExpense}
+        type={expenseType}
       />
 <div className="space-y-6 px-6">
      <div className="mt-16 space-y-6">

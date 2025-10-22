@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useData } from '@/context/DataContext';
 
 import DataTable from '@/components/Table/DataTable';
-import { Edit, Filter, Pencil, Plus, ReceiptIndianRupee, Search, Trash2 } from 'lucide-react';
+import { Copy, Edit, Filter, Pencil, Plus, ReceiptIndianRupee, Search, Trash2 } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from '@/components/ui/button';
 import {
@@ -51,6 +51,7 @@ function Income() {
             e.stopPropagation(); // prevent row click navigation
             setEditIncome(row.original); // pass whole row data
             setShowModal(true);
+            setIncomeType('edit');
           }}
         >
           <Edit className="w-4 h-4" />
@@ -64,6 +65,17 @@ function Income() {
           }}
         >
           <Trash2 className="w-4 h-4" />
+        </Button>
+        <Button
+          size="icon"
+          variant="outline"
+          onClick={(e) => {
+            e.stopPropagation();
+            setEditIncome(row.original);
+            setShowModal(true);
+          }}
+        >
+          <Copy className="w-4 h-4" />
         </Button>
       </div>
     ),
@@ -136,6 +148,7 @@ function Income() {
   const [editingIncome, setEditIncome] = useState(null);
    const [projectOptions,setProjectOptions]= useState([]);
   const [phaseOptions,setPhaseOptions] =useState([]);
+  const [incomeType,setIncomeType]= useState('');
   const [infoDialog, setInfoDialog] = useState({ open: false, type: "", message: "" });
   const [confirmDialog, setConfirmDialog] = useState({ open: false, incomeId: null });
   const [activeFilters, setActiveFilters] = useState({}); //for to show the which filter is applied
@@ -372,10 +385,12 @@ const paymentMethod = unique(allIncomes.map((i) => i?.paymentMethod));
         onClose={() => {
           setShowModal(false);
           setEditIncome(null);
+          setIncomeType('');
         }}
         onSubmit={handleAddIncome}
         onEdit={handleEditIncome}
         editIncome={editingIncome}
+        type={incomeType}
       />
        
 <div className="space-y-6 px-6">

@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Calendar, Users, ReceiptIndianRupee, ArrowLeft, Edit, Trash2, Building2, Tags, ReceiptText,Plus, CheckSquare, Layers, Eye } from "lucide-react";
+import { Calendar, Users, ReceiptIndianRupee, ArrowLeft, Edit, Trash2, Building2, Tags, ReceiptText,Plus, CheckSquare, Layers, Eye, Copy } from "lucide-react";
 import { useData } from "@/context/DataContext";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
@@ -50,6 +50,7 @@ export default function ProjectDetail() {
             e.stopPropagation(); // prevent row click navigation
             setEditIncome(row.original); // pass whole row data
             setShowIncomeModal(true);
+            setIncomeType('edit');
           }}
         >
           <Edit className="w-4 h-4" />
@@ -63,6 +64,17 @@ export default function ProjectDetail() {
           }}
         >
           <Trash2 className="w-4 h-4" />
+        </Button>
+        <Button
+          size="icon"
+          variant="outline"
+          onClick={(e) => {
+            e.stopPropagation();
+            setEditIncome(row.original);
+            setShowIncomeModal(true);
+          }}
+        >
+          <Copy className="w-4 h-4" />
         </Button>
       </div>
     ),
@@ -129,6 +141,7 @@ const expenseColumns =[
             e.stopPropagation(); // prevent row click navigation
             setEditExpense(row.original); // pass whole row data
             setShowExpenseModal(true);
+            setExpenseType('edit');
           }}
         >
           <Edit className="w-4 h-4" />
@@ -143,6 +156,17 @@ const expenseColumns =[
         >
           <Trash2 className="w-4 h-4" />
         </Button>
+         <Button
+                  size="icon"
+                  variant="outline"
+                  onClick={(e) => {
+                    e.stopPropagation(); // prevent row click navigation
+                    setEditExpense(row.original); // pass whole row data
+                    setShowExpenseModal(true);
+                  }}
+                >
+                  <Copy className="w-4 h-4" />
+                </Button>
       </div>
     ),
   },
@@ -248,11 +272,13 @@ const expenseColumns =[
     const {user} = useAuth();
   //Income
     const [incomes,setIncomes] = useState([]);
+    const [incomeType,setIncomeType]= useState('');
      const [showIncomeModal, setShowIncomeModal] = useState(false);
      const [editingIncome, setEditIncome] = useState(null);
   
      //Expense
      const [expenses, setExpenses] = useState([]);
+     const [expenseType,setExpenseType] = useState('');
      const [showExpenseModal, setShowExpenseModal] = useState(false);
      const [editingExpense, setEditExpense] = useState(null);
     
@@ -1114,12 +1140,13 @@ const handleform = (type , phase = null , project=null)=>{
           setShowIncomeModal(false);
           setEditIncome(null);
             setSelectedProject(null);
-            
+            setIncomeType('');
         }}
         selectedProject={selectedProject} // Pass selected project
         onSubmit={handleAddIncome}
         onEdit={handleEditIncome}
         editIncome={editingIncome}
+        type={incomeType}
       />
        <AddExpense
         isOpen={showExpenseModal}
@@ -1127,12 +1154,13 @@ const handleform = (type , phase = null , project=null)=>{
           setShowExpenseModal(false);
           setEditExpense(null);
             setSelectedProject(null);
-            
+            setExpenseType('');
         }}   
         selectedProject={selectedProject} // Pass selected project
         onSubmit={handleAddExpense}
          onEdit={handleEditExpense}
          editExpense={editingExpense}
+         type={expenseType}
       />
     {/* Confirm Delete AlertDialog for Project */}
                   <AlertDialog open={confirmDialog.open} onOpenChange={(open) => setConfirmDialog({ ...confirmDialog, open })}>

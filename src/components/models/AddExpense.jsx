@@ -9,7 +9,7 @@ import { useData } from '../../context/DataContext';
 
 
 
-function AddExpense({ isOpen, onClose, onSubmit, editExpense, onEdit,selectedProject,selectedPhase }) {
+function AddExpense({ isOpen, onClose, onSubmit, editExpense, onEdit,selectedProject,selectedPhase,type }) {
     const [formData,setFormData]=useState({
         name:"",
         description:"",
@@ -178,7 +178,7 @@ function AddExpense({ isOpen, onClose, onSubmit, editExpense, onEdit,selectedPro
                       paymentDate: formData.paymentDate ? formData.paymentDate.toISOString().split("T")[0] : "",
                      
                     };
-                if (editExpense) {
+                if (type==="edit") {
                   const res=await API.put(`/expense/${editExpense._id}`, payload);
                     onEdit?.(res.data.data);
                     
@@ -261,7 +261,7 @@ function AddExpense({ isOpen, onClose, onSubmit, editExpense, onEdit,selectedPro
                    <div className={styles.overlay}>
                         <div className={styles.modal}>
                             <div className={styles.header}>
-                            <h2>{editExpense ? 'Edit Expense' : 'Add New Expense'}</h2>
+                            <h2>{type==='edit' ? 'Edit Expense' : 'Add New Expense'}</h2>
                             <button onClick={handleCancel} className={styles.closeButton}>
                                 <X size={20} />
                             </button>
@@ -451,7 +451,7 @@ function AddExpense({ isOpen, onClose, onSubmit, editExpense, onEdit,selectedPro
                                     Cancel
                                     </button>
                                     <button type="submit" disabled={btnLoading} className={styles.submitButton}>
-                                    {btnLoading? "Uploading" : (editExpense ? 'Update Expense' : 'Add Expense')}
+                                    {btnLoading? "Uploading" : (type==='edit' ? 'Update Expense' : 'Add Expense')}
                                     </button>
                                 </div>
                                 

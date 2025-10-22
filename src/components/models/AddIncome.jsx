@@ -9,7 +9,7 @@ import { useData } from '../../context/DataContext';
 
 
 
-function AddIncome({ isOpen, onClose, onSubmit, editIncome, onEdit,selectedProject,selectedPhase  }) {
+function AddIncome({ isOpen, onClose, onSubmit, editIncome, onEdit,selectedProject,selectedPhase,type  }) {
     const [formData,setFormData]=useState({
         name:"",
         description:"",
@@ -71,7 +71,8 @@ function AddIncome({ isOpen, onClose, onSubmit, editIncome, onEdit,selectedProje
               amount: editIncome.amount || "",
               transactionNo:editIncome.transactionNo || "",
             });
-        } else {
+        }
+         else {
           setFormData({
             name:"",
             description:"",
@@ -115,7 +116,7 @@ function AddIncome({ isOpen, onClose, onSubmit, editIncome, onEdit,selectedProje
                       paymentDate: formData.paymentDate ? formData.paymentDate.toISOString().split("T")[0] : "",
                      
                     };
-                if (editIncome) {
+                if (type==="edit") {
                   const res=await API.put(`/income/${editIncome._id}`, payload);
                     onEdit?.(res.data.data);
                     
@@ -176,7 +177,7 @@ function AddIncome({ isOpen, onClose, onSubmit, editIncome, onEdit,selectedProje
                    <div className={styles.overlay}>
                         <div className={styles.modal}>
                             <div className={styles.header}>
-                            <h2>{editIncome ? 'Edit Income' : 'Add New Income'}</h2>
+                            <h2>{type==="edit" ? 'Edit Income' : 'Add New Income'}</h2>
                             <button onClick={handleCancel} className={styles.closeButton}>
                                 <X size={20} />
                             </button>
@@ -280,7 +281,7 @@ function AddIncome({ isOpen, onClose, onSubmit, editIncome, onEdit,selectedProje
                                     Cancel
                                     </button>
                                     <button type="submit" disabled={btnLoading} className={styles.submitButton}>
-                                    {btnLoading? "Uploading" : (editIncome ? 'Update Income' : 'Add Income')}
+                                    {btnLoading? "Uploading" : (type==="edit" ? 'Update Income' : 'Add Income')}
                                     </button>
                                 </div>
                                 

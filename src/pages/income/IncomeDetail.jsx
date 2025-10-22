@@ -29,6 +29,7 @@ export default function IncomeDetail() {
   const navigate = useNavigate();
   const { incomeContext,setIncomeContext,projectContext,phaseContext } = useData();
   const [income,setIncome] = useState('');
+  const [incomeType,setIncomeType]= useState('');
   const [projectOptions,setProjectOptions]= useState([]);
   const [phaseOptions,setPhaseOptions] =useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -67,6 +68,7 @@ export default function IncomeDetail() {
   const handleEdit = (income) => {
     setEditIncome(income); // force new reference
     setShowModal(true);
+    setIncomeType('edit');
   };
   const handleEditIncome = async(updated) => {
      
@@ -184,9 +186,11 @@ export default function IncomeDetail() {
         onClose={() => {
           setShowModal(false);
           setEditIncome(null);
+          setIncomeType('');
         }}
          onEdit={handleEditIncome}
          editIncome={editingIncome}
+         type={incomeType}
       />
        {/* Confirm Delete AlertDialog */}
                   <AlertDialog open={confirmDialog.open} onOpenChange={(open) => setConfirmDialog({ ...confirmDialog, open })}>

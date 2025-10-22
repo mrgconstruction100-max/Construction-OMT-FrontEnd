@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import {Eye, Calendar, Users, ReceiptIndianRupee, ArrowLeft, Edit, Trash2, Building2, Layers, CheckSquare, BookCheck, Tags, ReceiptText } from "lucide-react";
+import {Eye, Calendar, Users, ReceiptIndianRupee, ArrowLeft, Edit, Trash2, Building2, Layers, CheckSquare, BookCheck, Tags, ReceiptText, Copy } from "lucide-react";
 import { useData } from "@/context/DataContext";
 import { useEffect, useState } from "react";
 import AddPhases from "@/components/models/AddPhases";
@@ -164,6 +164,7 @@ const expenseColumns =[
             e.stopPropagation(); // prevent row click navigation
             setEditExpense(row.original); // pass whole row data
             setShowExpenseModal(true);
+            setExpenseType('edit');
           }}
         >
           <Edit className="w-4 h-4" />
@@ -177,6 +178,17 @@ const expenseColumns =[
           }}
         >
           <Trash2 className="w-4 h-4" />
+        </Button>
+           <Button
+          size="icon"
+          variant="outline"
+          onClick={(e) => {
+            e.stopPropagation(); // prevent row click navigation
+            setEditExpense(row.original); // pass whole row data
+            setShowExpenseModal(true);
+          }}
+        >
+          <Copy className="w-4 h-4" />
         </Button>
       </div>
     ),
@@ -269,6 +281,7 @@ const expenseColumns =[
 
   //EXPENSE
     const [expenses,setExpenses] = useState([]);
+    const [expenseType,setExpenseType] = useState('');
      const [showExpenseModal, setShowExpenseModal] = useState(false);
      const [editingExpense, setEditExpense] = useState(null);
   //Tasks
@@ -913,6 +926,7 @@ const handleform = (type , phase = null , project=null)=>{
           setEditExpense(null);
             setSelectedProject(null);
             setSelectedPhase(null);
+            setExpenseType('');
         }}
        
         selectedPhase={selectedPhase} // Pass selected task
@@ -920,6 +934,7 @@ const handleform = (type , phase = null , project=null)=>{
         onSubmit={handleAddExpense}
          onEdit={handleEditExpense}
          editExpense={editingExpense}
+         type={expenseType}
       />
       {/* Confirm Delete AlertDialog for Phase */}
                   <AlertDialog open={confirmDialog.open} onOpenChange={(open) => setConfirmDialog({ ...confirmDialog, open })}>
