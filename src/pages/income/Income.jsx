@@ -141,7 +141,8 @@ function Income() {
 ]
   const [incomes, setIncomes] = useState([]);
   const [allIncomes,setAllIncomes] = useState([]);
-  const [totalIncome, setTotalIncome] = useState(0);
+  const [totalIncome, setTotalIncome] = useState('');
+  const [filteredIncome,setFilteredIncome] = useState(0);
   const {incomeContext,setIncomeContext,projectContext,phaseContext} = useData();
   const [globalFilter, setGlobalFilter] = useState('');
   const [showModal, setShowModal] = useState(false);
@@ -159,15 +160,20 @@ function Income() {
     setAllIncomes(incomeContext);
     fetchOptions();
         
-  },[incomeContext])
+  },[incomeContext,projectContext,phaseContext])
 
   useEffect(() => {
   const total = incomes.reduce(
     (sum, income) => sum + (income?.amount || 0),
     0
   );
-  setTotalIncome(total);
-}, [incomes]);
+   const allTotal = allIncomes.reduce(
+    (sum, income) => sum + (income?.amount || 0),
+    0
+  );
+  setTotalIncome(allTotal);
+  setFilteredIncome(total);
+}, [incomes,allIncomes]);
 
 const fetchOptions =() =>{
       setProjectOptions(projectContext.map(project=>({
@@ -272,23 +278,31 @@ const fetchOptions =() =>{
         let filtered = [...allIncomes];
         const newActiveFilters = {};
        
+          if (filters.startDate) {
+          const start = new Date(filters.startDate).setHours(0, 0, 0, 0);
+          filtered = filtered.filter(
+            (p) => new Date(p.paymentDate).setHours(0, 0, 0, 0) >= start
+          );
+         newActiveFilters.startDate = filters.startDate;
+        }
 
+        if (filters.endDate) {
+          const end = new Date(filters.endDate).setHours(23, 59, 59, 999);
+          filtered = filtered.filter(
+            (p) => new Date(p.paymentDate).setHours(0, 0, 0, 0) <= end
+          );
+          newActiveFilters.endDate = filters.endDate;
+        }
         if (filters.project) {
           filtered = filtered.filter(
-            (p) => p.projectId.name === filters.project
+            (p) => filters.project.includes(p.projectId.name)
           );
           newActiveFilters.project = filters.project;
         }
-        if (filters.phase) {
-          filtered = filtered.filter(
-            (p) => p.phaseId.name === filters.phase
-          );
-          newActiveFilters.phase = filters.phase;
-        }
-       
+        
          if (filters.paymentMethod) {
             filtered = filtered.filter(
-              (p) => p.paymentMethod.toLowerCase() === filters.paymentMethod.toLowerCase()
+              (p) => filters.paymentMethod.includes(p.paymentMethod)
             );
             newActiveFilters.paymentMethod = filters.paymentMethod;
           }
@@ -339,6 +353,13 @@ const clearFilter = (filterKey) => {
         
   const unique = (arr) => [...new Set(arr.filter(Boolean))]; // Removes duplicates & empty
 const paymentMethod = unique(allIncomes.map((i) => i?.paymentMethod));
+
+// ✅ Calculate totals by payment method dynamically
+const paymentTotals = allIncomes.reduce((acc, income) => {
+  const method = income.paymentMethod || "Unknown";
+  acc[method] = (acc[method] || 0) + (income.amount || 0);
+  return acc;
+}, {});
   return (
         <div >
           <div className="sticky top-12 z-50 flex  justify-between items-center border-b border-border bg-card/80 backdrop-blur-sm w-full  pe-6 ps-4  py-4">
@@ -365,11 +386,10 @@ const paymentMethod = unique(allIncomes.map((i) => i?.paymentMethod));
                   
                     <FilterComp
                       fields={[
-                        // { name: "startDate", label: "Date From", type: "startDate" },
-                        // { name: "endDate", label: "Date To", type: "endDate" },
-                        { name: "project", label: "Project", type: "select", options: projectOptions.map((p) => p.label) },
-                        // { name: "phase", label: "Phase", type: "select", options: phaseOptions.map((ph) => ph.label) },
-                        { name: "paymentMethod", label: "Payment Method", type: "select", options: paymentMethod },
+                        { name: "startDate", label: "Date From", type: "startDate" },
+                        { name: "endDate", label: "Date To", type: "endDate" },
+                        { name: "project", label: "Project", type: "multiselect", options: projectOptions.map((p) => p.label) },
+                        { name: "paymentMethod", label: "Payment Method", type: "multiselect", options: paymentMethod },
                         
                         
                       ]}
@@ -404,18 +424,31 @@ const paymentMethod = unique(allIncomes.map((i) => i?.paymentMethod));
               />
             <div></div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              
-       
+                <StatsCard
+                        title="Total Income"
+                        value={formatCurrency(totalIncome)}
+                        icon={<ReceiptIndianRupee className="w-5 h-5" />}
+                       
+                   />
+
+                    {/* ✅ Dynamic payment method StatsCards */}
+                {Object.entries(paymentTotals).map(([method, total]) => (
+                  <StatsCard
+                    key={method}
+                    title={`${method} Income`}
+                    value={formatCurrency(total)}
+                    icon={<ReceiptIndianRupee className="w-5 h-5" />}
+                  />
+                ))}
+                  
 
                 <StatsCard
-                    title="Total Income"
-                    value={formatCurrency(totalIncome)}
+                    title="Total Filtered Income"
+                    value={formatCurrency(filteredIncome)}
                     icon={<ReceiptIndianRupee className="w-5 h-5" />}
                   />
                  
-               
-                
-               
+         
               </div>
           <DataTable data={incomes} columns={incomeColumns} globalFilter={globalFilter}
             onGlobalFilterChange={setGlobalFilter} onRowClick={handleRowClick}/>

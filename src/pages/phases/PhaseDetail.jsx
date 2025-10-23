@@ -658,7 +658,7 @@ const handleform = (type , phase = null , project=null)=>{
          
          <StatsCard
             title="Total Expense"
-            value={`₹ ${phase?.expense}`|| 0}
+            value={`${formatCurrency(phase?.expense)}`}
             description={`for this phase`}
             icon={<ReceiptIndianRupee className="w-5 h-5" />}
             
@@ -701,15 +701,15 @@ const handleform = (type , phase = null , project=null)=>{
             </div>
              <div className="flex items-center gap-2 text-sm">
               <ReceiptIndianRupee className="w-4 h-4" />
-              <span>Allocated Budget: ₹{phase.budget}</span>
+              <span>Allocated Budget: {formatCurrency(phase.budget)}</span>
             </div>
             <div className="flex items-center gap-2 text-sm ">
               <ReceiptIndianRupee className="w-4 h-4" />
-              <span>Expenditure: ₹{phase.expense}</span>
+              <span>Expenditure: {formatCurrency(phase.expense)}</span>
             </div>
            <div className="flex items-center gap-2 text-sm">
               <ReceiptIndianRupee className="w-4 h-4" />
-              <span>Budget Balance: ₹{phase.budgetBalance}</span>
+              <span>Budget Balance: {formatCurrency(phase.budgetBalance)}</span>
             </div>
           
 
@@ -717,7 +717,7 @@ const handleform = (type , phase = null , project=null)=>{
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span>Budget Used</span>
-              <span>₹{phase.expense} / ₹{phase.budget}</span>
+              <span>{formatCurrency(phase.expense)} / {formatCurrency(phase.budget)}</span>
             </div>
             <Progress spent={phase?.expense} budget={phase?.budget} mode="budget" className="h-2" />
           </div>

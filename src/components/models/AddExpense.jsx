@@ -38,6 +38,7 @@ function AddExpense({ isOpen, onClose, onSubmit, editExpense, onEdit,selectedPro
     const [errors, setErrors] = useState({});
     const [btnLoading, setBtnLoading] = useState(false);
     const [category, setCategory] = useState([]);
+    const [paymentCategory,setPaymentCategory] = useState([]);
 
     useEffect(()=>{
       setProjectOptions(projectContext.map(project=>({
@@ -57,7 +58,11 @@ function AddExpense({ isOpen, onClose, onSubmit, editExpense, onEdit,selectedPro
        const uniqueCategory = [...new Set(expenseContext.map(e => e.category).filter(Boolean))];
        const defaultCategory = ["Travel", "Labour","Materials","Miscellaneous"] ;
        const combinedCategory =[...new Set([...defaultCategory,...uniqueCategory])];
+       const uniqueMethod =  [...new Set(expenseContext.map(e => e.paymentMethod).filter(Boolean))];
+       const defaultMethod = ["Cash", "UPI"] ;
+       const combinedMethod = [...new Set([...defaultMethod,...uniqueMethod])];
         setCategory(combinedCategory);
+        setPaymentCategory(combinedMethod);
     }, [expenseContext]);
 
     useEffect(() => {
@@ -420,29 +425,25 @@ function AddExpense({ isOpen, onClose, onSubmit, editExpense, onEdit,selectedPro
                                         />
                                         <DropdownSelect
                                             label="Payment Method"
-                                            options={[
-                                              { value: "Cash", label: "Cash" },
-                                              { value: "UPI", label: "UPI" },
-                                              { value: "Bank", label: "Bank" },
-                                              { value: "Others", label: "Others" }
-                                            ]}
+                                            options={paymentCategory.map(p => ({ value: p, label: p }))} // ✅ convert to objects
                                             value={formData.paymentMethod}
-                                            onChange={(value) => setFormData({ ...formData, paymentMethod: value })}
-                                            required
-                                            error={errors.paymentMethod}
+                                           onChange={(value) =>{ setFormData({ ...formData,paymentMethod: value })
+                                              if (value && !paymentCategory.includes(value)) setPaymentCategory([...paymentCategory, value]);
+                                              } }
+                                              searchable={true}
+                                              creatable={true} // allow typing new role
+                                              required
+                                               error={errors.paymentMethod}
                                           />
 
-                                          {/* Show Transaction No only if payment method is GPay or Bank */}
-                                          {(formData.paymentMethod === "UPI" || formData.paymentMethod === "Bank") && (
                                             <FormInput
                                               label="Reference"
                                               value={formData.transactionNo}
                                               onChange={(value) => setFormData({ ...formData, transactionNo: value })}
                                               placeholder="Enter reference details"
-                                              
-                                              
+           
                                             />
-                                          )}
+                                  
                                       
                                 </div>                        
                                                               

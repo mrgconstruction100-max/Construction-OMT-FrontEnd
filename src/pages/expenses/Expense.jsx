@@ -139,7 +139,8 @@ function Expense() {
 ]
   const [expenses, setExpenses] = useState([]);
   const [allExpenses,setAllExpenses] = useState([]);
-  const [totalExpense,setTotalExpense] = useState(0);
+  const [totalExpense,setTotalExpense] = useState('');
+  const [filteredExpense,setFilteredExpense] = useState(0);
   const [expenseType,setExpenseType]= useState('');
   const {expenseContext,setExpenseContext,projectContext,phaseContext} = useData();
   const [globalFilter, setGlobalFilter] = useState('');
@@ -163,8 +164,13 @@ function Expense() {
       (sum, expense) => sum + (expense?.amount || 0),
       0
     );
-    setTotalExpense(total);
-  }, [expenses]);
+     const allTotal = allExpenses.reduce(
+      (sum, expense) => sum + (expense?.amount || 0),
+      0
+    );
+    setTotalExpense(allTotal);
+    setFilteredExpense(total);
+  }, [expenses,allExpenses]);
   
 const fetchOptions =() =>{
       setProjectOptions(projectContext.map(project=>({
@@ -274,22 +280,36 @@ const fetchOptions =() =>{
         let filtered = [...allExpenses];
         const newActiveFilters = {};
        
+          if (filters.startDate) {
+          const start = new Date(filters.startDate).setHours(0, 0, 0, 0);
+          filtered = filtered.filter(
+            (p) => new Date(p.paymentDate).setHours(0, 0, 0, 0) >= start
+          );
+         newActiveFilters.startDate = filters.startDate;
+        }
 
+        if (filters.endDate) {
+          const end = new Date(filters.endDate).setHours(23, 59, 59, 999);
+          filtered = filtered.filter(
+            (p) => new Date(p.paymentDate).setHours(0, 0, 0, 0) <= end
+          );
+          newActiveFilters.endDate = filters.endDate;
+        }
         if (filters.project) {
           filtered = filtered.filter(
-            (p) => p.projectId.name === filters.project
+            (p) => filters.project.includes(p.projectId.name)
           );
           newActiveFilters.project = filters.project;
         }
         if (filters.phase) {
           filtered = filtered.filter(
-            (p) => p.phaseId.name === filters.phase
+            (p) => filters.phase.includes(p.phaseId.name)
           );
           newActiveFilters.phase = filters.phase;
         }
          if (filters.paymentMethod) {
             filtered = filtered.filter(
-              (p) => p.paymentMethod.toLowerCase() === filters.paymentMethod.toLowerCase()
+              (p) => filters.paymentMethod.includes(p.paymentMethod)
             );
             newActiveFilters.paymentMethod = filters.paymentMethod;
           }
@@ -346,6 +366,13 @@ const clearFilter = (filterKey) => {
   };
   const unique = (arr) => [...new Set(arr.filter(Boolean))]; // Removes duplicates & empty
 const category = unique(allExpenses.map((e) => e?.category));
+const paymentMethod = unique(allExpenses.map((e) => e?.paymentMethod));
+// ✅ Calculate totals by payment method dynamically
+const paymentTotals = allExpenses.reduce((acc, expense) => {
+  const method = expense.paymentMethod || "Unknown";
+  acc[method] = (acc[method] || 0) + (expense.amount || 0);
+  return acc;
+}, {})
   return (
         <div >
           <div className="sticky top-12 z-50 flex  justify-between items-center border-b border-border bg-card/80 backdrop-blur-sm w-full  pe-6 ps-4  py-4">
@@ -372,9 +399,11 @@ const category = unique(allExpenses.map((e) => e?.category));
                   
                     <FilterComp
                       fields={[
-                        { name: "project", label: "Project", type: "select", options: projectOptions.map((p) => p.label) },
-                        { name: "phase", label: "Phase", type: "select", options: phaseOptions.map((ph) => ph.label) },                 
-                        { name: "paymentMethod", label: "Payment Method", type: "select", options: ["Cash", "GPay", "Others"] },
+                        { name: "startDate", label: "Date From", type: "startDate" },
+                        { name: "endDate", label: "Date To", type: "endDate" },
+                        { name: "project", label: "Project", type: "multiselect", options: projectOptions.map((p) => p.label) },
+                        { name: "phase", label: "Phase", type: "multiselect", options: phaseOptions.map((ph) => ph.label) },                 
+                        { name: "paymentMethod", label: "Payment Method", type: "multiselect", options: paymentMethod },
                         { name: "category", label: "Category", type: "multiselect", options: category},
                         
                       ]}
@@ -414,6 +443,23 @@ const category = unique(allExpenses.map((e) => e?.category));
                         icon={<ReceiptIndianRupee className="w-5 h-5" />}
                       />
                  
+                          {/* ✅ Dynamic payment method StatsCards */}
+                                 {Object.entries(paymentTotals).map(([method, total]) => (
+                                   <StatsCard
+                                     key={method}
+                                     title={`${method} Expense`}
+                                     value={formatCurrency(total)}
+                                     icon={<ReceiptIndianRupee className="w-5 h-5" />}
+                                   />
+                                 ))}
+                                   
+                 
+                                 <StatsCard
+                                     title="Total Filtered Expense"
+                                     value={formatCurrency(filteredExpense)}
+                                     icon={<ReceiptIndianRupee className="w-5 h-5" />}
+                                   />
+                                  
                  </div>
           <DataTable data={expenses} columns={expenseColumns} globalFilter={globalFilter}
             onGlobalFilterChange={setGlobalFilter} onRowClick={handleRowClick}/>
