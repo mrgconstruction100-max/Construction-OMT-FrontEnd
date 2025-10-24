@@ -59,6 +59,16 @@ export function ProjectProgress() {
     });
       setProjects(updatedProjects);
   },[projectContext,taskContext])
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+      const date = new Date(dateString);
+        if (isNaN(date.getTime())) return "N/A";
+          return date.toLocaleDateString('en-IN',{
+                  day:"numeric",
+                  month:"long",
+                  year:"2-digit"
+                })
+        }
   return (
     <Card className="border-muted-foreground/20 overflow-auto h-[500px] flex flex-col ">
       <CardHeader className="flex-shrink-0 bg-white sticky top-0 z-10 ">
@@ -71,11 +81,7 @@ export function ProjectProgress() {
               <div className="flex-1 min-w-0" onClick={() => navigate(`project/${project._id}`)} style={{ cursor: "pointer" }}>
                 <h4 className="font-medium text-foreground truncate" >{project.name}</h4>
                 <p className="text-sm text-muted-foreground">
-                  Due {new Date(project.endDate).toLocaleDateString('en-IN',{
-                                                        day:"numeric",
-                                                        month:"long",
-                                                        year:"2-digit"
-                                                      })}  • {project.tasksCompleted}/{project.totalTasks} tasks
+                  Due {formatDate(project.endDate)}  • {project.tasksCompleted}/{project.totalTasks} tasks
                 </p>
               </div>
               <Badge variant="secondary" className={getStatusColor(project.status)}>

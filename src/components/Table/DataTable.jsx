@@ -22,6 +22,9 @@ function DataTable({ data, columns, globalFilter, onGlobalFilterChange, onRowCli
         getSortedRowModel: getSortedRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
+        initialState: {
+            pagination: { pageSize: 50 },
+        },
     });
     const [pageSize, setPageSize] = useState('');
     return (
