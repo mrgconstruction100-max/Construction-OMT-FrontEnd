@@ -865,7 +865,14 @@ const handleform = (type , phase = null , project=null)=>{
                     <span>Timeline:</span>
                     <span className="font-medium text-foreground">{formatDate(task?.startDate)} - {formatDate(task?.endDate)}</span>
                   </div>
-                 
+                  {task.budget&&
+                 <div className="flex items-center gap-2 text-muted-foreground">
+                    <ReceiptIndianRupee className="w-4 h-4" />
+                  
+                    <span>Allocated Budget:</span>
+                    <span className="font-medium text-foreground"> {formatCurrency(task?.budget)} </span>
+                  </div>
+                  }
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Users className="w-4 h-4" />
                     <span className="font-medium text-foreground">{task.assignedTo?.map((m) => (

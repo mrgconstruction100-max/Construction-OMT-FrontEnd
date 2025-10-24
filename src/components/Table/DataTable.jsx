@@ -8,7 +8,7 @@ import {
     flexRender,
 } from '@tanstack/react-table';
 import './DataTable.scss';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 
 function DataTable({ data, columns, globalFilter, onGlobalFilterChange, onRowClick }) {
     const table = useReactTable({
@@ -23,10 +23,57 @@ function DataTable({ data, columns, globalFilter, onGlobalFilterChange, onRowCli
         getPaginationRowModel: getPaginationRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
     });
-
+    const [pageSize, setPageSize] = useState('');
     return (
         <div className="data-table">
-            <div className="table-wrapper overflow-x-auto">
+            
+            <div className="pagination">
+                <button 
+                    onClick={() => table.previousPage()} 
+                    disabled={!table.getCanPreviousPage()}
+                    aria-label="Previous page"
+                >
+                    ← Previous
+                </button>
+                
+                <div className="pagination-info">
+                    <span>
+                        Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+                    </span>
+                    <select
+                        value={table.getState().pagination.pageIndex}
+                        onChange={(e) => table.setPageIndex(Number(e.target.value))}
+                        aria-label="Go to page"
+                    >
+                        {Array.from({ length: table.getPageCount() }, (_, i) => (
+                            <option key={i} value={i}>
+                                Page {i + 1}
+                            </option>
+                        ))}
+                    </select>
+                     <select
+                            value={table.getState().pagination.pageSize}
+                            onChange={(e) => {table.setPageSize(Number(e.target.value));setPageSize(e.target.value)}}
+                        >
+                            {[10, 25, 50, 100].map(size => (
+                            <option key={size} value={size}>
+                                Show {size}
+                            </option>
+                            ))}
+                        </select>
+                </div>
+                
+                <button 
+                    onClick={() => table.nextPage()} 
+                    disabled={!table.getCanNextPage()}
+                    aria-label="Next page"
+                >
+                    Next →
+                </button>
+            </div>
+ 
+
+            <div className="table-wrapper overflow-x-auto" >
                 <table >
                     <colgroup>
                         {/* ✅ Define column widths for fixed layout */}
@@ -76,7 +123,9 @@ function DataTable({ data, columns, globalFilter, onGlobalFilterChange, onRowCli
                     </tbody>
                 </table>
             </div>
-
+             {
+             pageSize>10&&
+                        
             <div className="pagination">
                 <button 
                     onClick={() => table.previousPage()} 
@@ -101,6 +150,16 @@ function DataTable({ data, columns, globalFilter, onGlobalFilterChange, onRowCli
                             </option>
                         ))}
                     </select>
+                     <select
+                            value={table.getState().pagination.pageSize}
+                            onChange={(e) => table.setPageSize(Number(e.target.value))}
+                        >
+                            {[10, 25, 50, 100].map(size => (
+                            <option key={size} value={size}>
+                                Show {size}
+                            </option>
+                            ))}
+                        </select>
                 </div>
                 
                 <button 
@@ -111,6 +170,9 @@ function DataTable({ data, columns, globalFilter, onGlobalFilterChange, onRowCli
                     Next →
                 </button>
             </div>
+            }
+            
+
         </div>
     );
 }

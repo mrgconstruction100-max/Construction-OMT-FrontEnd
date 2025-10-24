@@ -115,7 +115,8 @@
   }
 
   .pagination {
-    margin-top: 1rem;
+     margin-top: 1rem;
+    margin-bottom:1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -215,3 +216,40 @@
  
 }
 
+.table-container {
+  position: relative;
+}
+
+.side-arrow {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #555;
+  font-size: 24px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  user-select: none;
+}
+
+.table-container:hover .side-arrow {
+  opacity: 0.3;
+}
+
+.side-arrow:hover {
+  opacity: 1;
+}
+
+.side-arrow.left {
+  left: 0;
+  background: linear-gradient(to right, rgba(255,255,255,0.8), transparent);
+}
+
+.side-arrow.right {
+  right: 0;
+  background: linear-gradient(to left, rgba(255,255,255,0.8), transparent);
+}

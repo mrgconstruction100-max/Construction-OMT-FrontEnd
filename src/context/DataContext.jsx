@@ -145,7 +145,7 @@ export const DataProvider = ({ children }) => {
 
     try {
            const res=  await API.get("/expense");
-           const sorted = res.data.data.sort((a,b)=>a.customId - b.customId)
+           const sorted = res.data.data.sort((a,b)=> new Date(b.paymentDate) - new Date(a.paymentDate))
            setExpenseContext(sorted);
          
            
@@ -160,7 +160,7 @@ export const DataProvider = ({ children }) => {
 
     try {
            const res=  await API.get("/income");
-           const sorted = res.data.data.sort((a,b)=>a.customId - b.customId)
+           const sorted = res.data.data.sort((a,b)=> new Date(b.paymentDate) - new Date(a.paymentDate))
            setIncomeContext(sorted);
          
            

@@ -75,6 +75,16 @@ function Expense() {
     accessorKey: 'customId',
     header: 'Expense ID',
   },
+   
+  {
+    accessorKey: 'paymentDate',
+    header: 'Payment Date',
+    cell: info => new Date(info.getValue() ).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    }),
+  },
   {
     accessorKey: 'name',
     header: 'Expense ',
@@ -107,16 +117,7 @@ function Expense() {
     },
   },
   
-  
-  {
-    accessorKey: 'paymentDate',
-    header: 'Payment Date',
-    cell: info => new Date(info.getValue() ).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    }),
-  },
+ 
   {
     accessorKey: 'paymentMethod',
     header: 'Payment Method',
@@ -197,9 +198,9 @@ const fetchOptions =() =>{
         phaseId:{_id:expenseData?.phaseId,name:phase?.label || ''},
        
       }
-      setExpenses(prev => [...prev, newExpense]);
-      setAllExpenses(prev => [...prev, newExpense]);
-      setExpenseContext(prev=>[...prev,newExpense]);
+      setExpenses(prev => [ newExpense,...prev]);
+      setAllExpenses(prev => [ newExpense,...prev]);
+      setExpenseContext(prev=>[newExpense,...prev]);
     } catch (error) {
       console.error("Error adding Expense:", error);
     }

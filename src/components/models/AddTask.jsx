@@ -302,16 +302,15 @@ function AddTasks({ isOpen, onClose, onSubmit, editTask, onEdit,selectedProject,
                                         error={errors.endDate}
                                         />
                                  
-                                         {/* <FormInput
+                                         <FormInput
                                         label="Budget"
                                         type='number'
                                         value={formData.budget}
                                         onChange={(value) => setFormData({ ...formData, budget: value })}
                                         placeholder="Enter amount"
                                         icon={<IndianRupee size={16} />}
-                                        required
-                                        error={errors.budget}
-                                        /> */}
+                                        
+                                        />
                                         
                                 </div>                        
                                                               

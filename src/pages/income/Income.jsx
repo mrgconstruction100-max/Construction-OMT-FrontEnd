@@ -84,6 +84,15 @@ function Income() {
     accessorKey: 'customId',
     header: 'Income ID',
   },
+   {
+    accessorKey: 'paymentDate',
+    header: 'Payment Date',
+    cell: info => new Date(info.getValue() ).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    }),
+  },
   {
     accessorKey: 'name',
     header: 'Income ',
@@ -116,15 +125,7 @@ function Income() {
   },
   
   
-  {
-    accessorKey: 'paymentDate',
-    header: 'Payment Date',
-    cell: info => new Date(info.getValue() ).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    }),
-  },
+ 
   {
     accessorKey: 'paymentMethod',
     header: 'Payment Method',
@@ -198,9 +199,10 @@ const fetchOptions =() =>{
         projectId:{_id:incomeData?.projectId,name:project?.label || ''},
  
       }
-      setIncomes(prev => [...prev, newIncome]);
-      setAllIncomes(prev => [...prev, newIncome]);
-      setIncomeContext(prev=>[...prev,newIncome]);
+      
+      setIncomes(prev => [ newIncome,...prev]);
+      setAllIncomes(prev => [ newIncome,...prev]);
+      setIncomeContext(prev=>[newIncome,...prev]);
     } catch (error) {
       console.error("Error adding Income:", error);
     }
