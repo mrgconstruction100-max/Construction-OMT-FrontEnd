@@ -29,6 +29,7 @@ import AddIncome from '@/components/models/AddIncome';
 import FilterComp from '../../components/filter/FilterComp';
 import FilterStatus from '../../components/filter/FilterStatus';
 import { StatsCard } from "@/components/dashboard/StatsCard";
+import ReportDownloader from '../../components/Report/ReportDownloader';
 const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
@@ -107,14 +108,14 @@ function Income() {
     },
   },
   
-  // {
-  //   accessorKey: 'phaseId',
-  //   header: 'Phase ',
-  //   cell: info => {
-  //     const phase = info.getValue();
-  //     return phase?.name|| 'N/A'; // ✅ Display task name instead of object
-  //   },
-  // },
+  {
+    accessorKey: 'phaseId',
+    header: 'Phase ',
+    cell: info => {
+      const phase = info.getValue();
+      return phase?.name|| 'N/A'; // ✅ Display task name instead of object
+    },
+  },
     {
     accessorKey: 'projectId',
     header: 'Project',
@@ -135,6 +136,11 @@ function Income() {
     accessorKey: 'transactionNo',
     header: 'Reference No',
     cell: info => info.getValue()?.toString().slice(0, 20) || '-', // truncate if long
+  },
+   {
+    accessorKey: 'description',
+    header: 'Description',
+    cell: info => info.getValue()?.toString().slice(0, 50) || '-', // truncate if long
   },
  
 
@@ -193,11 +199,11 @@ const fetchOptions =() =>{
   const handleAddIncome = async (incomeData) => {
    try {
       const project = projectOptions.find(p=>p.value ===incomeData.projectId);
-      
+      const phase = phaseOptions.find(ph=>ph.value===incomeData.phaseId);
       const newIncome = {
         ...incomeData,
         projectId:{_id:incomeData?.projectId,name:project?.label || ''},
- 
+        phaseId:{_id:incomeData?.phaseId,name:phase?.label || ''},
       }
       
       setIncomes(prev => [ newIncome,...prev]);
@@ -211,10 +217,11 @@ const fetchOptions =() =>{
   const handleEditIncome = async(updated) => {
      
      const project = projectOptions.find(p=>p.value ===updated.projectId);
-      
+      const phase = phaseOptions.find(ph=>ph.value===updated.phaseId);
       const updatedIncome = {
         ...updated,
         projectId:{_id:updated?.projectId,name:project?.label || ''},
+         phaseId:{_id:updated?.phaseId,name:phase?.label || ''},
       }
 
      setIncomes(prev =>
@@ -452,6 +459,20 @@ const paymentTotals = allIncomes.reduce((acc, income) => {
                  
          
               </div>
+              <ReportDownloader data={incomes}
+                            title={`Income Report`}
+                            columns={[
+                                { header: "Income Id", key: "customId" },
+                                { header: "Income Title", key: "name" },
+                                { header: "Description", key: "description" },
+                                { header: "Project Name", key: "projectId.name" },
+                                { header: "Phase Name", key: "phaseId.name" },
+                                { header: "Payment Date", key: "paymentDate",type: "date"},
+                                { header: "Amount", key: "amount"},
+                                { header: "Payment Method", key: "paymentMethod" },
+                                { header: "Reference", key: "reference" },
+                               
+                            ]} />
           <DataTable data={incomes} columns={incomeColumns} globalFilter={globalFilter}
             onGlobalFilterChange={setGlobalFilter} onRowClick={handleRowClick}/>
         </div>

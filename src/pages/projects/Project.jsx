@@ -242,6 +242,7 @@ export default function Projects() {
         budget: totalBudget,
         spent,
         revenue,
+        revenueBalance:revenue-spent,
         variance: totalBudget - spent,
         progress,
         pending:totalBudget-revenue,
@@ -669,12 +670,7 @@ const locations = unique(allProjects.map((p) => p?.location));
                     <span>Allocated Budget:</span>
                     <span className="font-medium text-foreground"> {formatCurrency(project.budget)} </span>
                   </div>
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                    <ReceiptIndianRupee className="w-4 h-4" />
-             
-                    <span>Client Payments:</span>
-                    <span className="font-medium text-foreground"> {formatCurrency(project?.revenue)} </span>
-                  </div>
+                    
                    <div className="flex items-center gap-2 text-muted-foreground">
                     <ReceiptIndianRupee className="w-4 h-4" />
                     
@@ -696,6 +692,18 @@ const locations = unique(allProjects.map((p) => p?.location));
                     <ReceiptIndianRupee className="w-4 h-4" />
                     <span>Budget Balance:</span>
                     <span className="font-medium text-foreground">{formatCurrency(project?.variance)}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <ReceiptIndianRupee className="w-4 h-4" />
+             
+                    <span>Client Payments:</span>
+                    <span className="font-medium text-foreground"> {formatCurrency(project?.revenue)} </span>
+                  </div>
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <ReceiptIndianRupee className="w-4 h-4" />
+             
+                    <span>Client Payments Balance:</span>
+                    <span className="font-medium text-foreground"> {formatCurrency(project?.revenueBalance)} </span>
                   </div>
                         {/*profit Progress */}
                   <div className="space-y-2">

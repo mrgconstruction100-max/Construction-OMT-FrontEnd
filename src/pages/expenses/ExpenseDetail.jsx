@@ -63,6 +63,14 @@ export default function ExpenseDetail() {
       day: 'numeric'
     })
   }
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount)
+  }
     //  Open Edit Modal
   const handleEdit = (expense) => {
     setEditExpense(expense); // force new reference
@@ -193,12 +201,12 @@ export default function ExpenseDetail() {
             {expense?.salary&&<div className="flex items-center gap-2 ">
                 <ReceiptIndianRupee  className="w-4 h-4"/>
                
-             <p>Salary Amount: ₹{expense?.salary}</p>
+             <p>Salary Amount: {formatCurrency(expense?.salary)}</p>
             </div>}
             {expense?.food&&<div className="flex items-center gap-2 ">
                 <ReceiptIndianRupee  className="w-4 h-4"/>
                
-             <p>Food Amount: ₹{expense?.food}</p>
+             <p>Food Amount: {formatCurrency(expense?.food)}</p>
             </div>}
             {expense?.unit&&<div className="flex items-center gap-2 ">
                 <ReceiptText  className="w-4 h-4"/>
@@ -213,17 +221,17 @@ export default function ExpenseDetail() {
             {expense?.price&&<div className="flex items-center gap-2 ">
                 <ReceiptIndianRupee  className="w-4 h-4"/>
                
-             <p>Unit Price: ₹{expense?.price}</p>
+             <p>Unit Price: {formatCurrency(expense?.price)}</p>
             </div>}
             
             {expense?.miscellaneous&&<div className="flex items-center gap-2 ">
                 <ReceiptIndianRupee  className="w-4 h-4"/>
                
-             <p>Miscellaneous Amount: ₹{expense?.miscellaneous}</p>
+             <p>Miscellaneous Amount: {formatCurrency(expense?.miscellaneous)}</p>
             </div>}
              <div className="flex items-center gap-2 ">
            <ReceiptIndianRupee className="w-4 h-4" />
-           <span>Total Amount: ₹{expense?.amount}</span>
+           <span>Total Amount: {formatCurrency(expense?.amount)}</span>
             </div>
 
         </CardContent>

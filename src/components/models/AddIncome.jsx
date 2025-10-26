@@ -124,6 +124,10 @@ function AddIncome({ isOpen, onClose, onSubmit, editIncome, onEdit,selectedProje
                       paymentDate: formData.paymentDate ? formData.paymentDate.toISOString().split("T")[0] : "",
                      
                     };
+                     // 🚨 remove empty PhaseId (avoid ObjectId cast error)
+                if (!payload.phaseId) {
+                  delete payload.phaseId;
+                }
                 if (type==="edit") {
                   const res=await API.put(`/income/${editIncome._id}`, payload);
                     onEdit?.(res.data.data);
@@ -222,15 +226,14 @@ function AddIncome({ isOpen, onClose, onSubmit, editIncome, onEdit,selectedProje
                                             required
                                             error={errors.projectId}
                                           />
-                                          {/* <DropdownSelect
+                                          <DropdownSelect
                                             label="Phase Name"
                                             options={phaseOptions}
                                             value={formData.phaseId}
                                             onChange={(value) =>setFormData({ ...formData, phaseId: value })}
                                             searchable
-                                            required
-                                            error={errors.phaseId}
-                                          /> */}
+                                            
+                                          />
                                         
                                          
                                         <DateSelect

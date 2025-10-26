@@ -78,7 +78,8 @@ function AddExpense({ isOpen, onClose, onSubmit, editExpense, onEdit,selectedPro
               if (formData.category === "Labour") {
                 total = salary + food + misc;
               } else if (formData.category === "Materials") {
-                total = qty * price + misc;
+                const roundedTotal = qty * price ;
+                total = parseFloat(roundedTotal.toFixed(2)) +misc;
               } else {
                 // For other categories, don't auto-calculate — user will type manually
                 return;

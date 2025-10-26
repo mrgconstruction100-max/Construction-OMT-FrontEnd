@@ -117,22 +117,30 @@ function Expense() {
     },
   },
   
- 
-  {
-    accessorKey: 'paymentMethod',
-    header: 'Payment Method',
-    
-  },
- 
   {
     accessorKey: 'paidTo',
     header: 'Paid To',
    
   },
   {
+    accessorKey: 'paymentMethod',
+    header: 'Payment Method',
+    
+  },
+  {
     accessorKey: 'category',
     header: 'Category',
    
+  },
+  {
+    accessorKey: 'refernce',
+    header: 'Reference',
+   
+  },
+  {
+    accessorKey: 'description',
+    header: 'Description',
+    cell: info => info.getValue()?.toString().slice(0, 50) || '-', // truncate if long
   },
   
 

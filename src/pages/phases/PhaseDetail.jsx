@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/dialog"
 import API from "../../axios";
 import DataTable from '@/components/Table/DataTable';
+import AddIncome from "../../components/models/AddIncome";
 
 const getStatusColor = (status) => {
   switch (status) {
@@ -263,9 +264,107 @@ const expenseColumns =[
   },
 ]
 
+const incomeColumns =[
+   {
+    id: "actions",
+    header: "Actions",
+    cell: ({ row }) => (
+      <div className="flex gap-2">
+        <Button
+          size="icon"
+          variant="default"
+          onClick={(e) => {
+            e.stopPropagation(); // prevent row click navigation
+            setEditIncome(row.original); // pass whole row data
+            setShowIncomeModal(true);
+            setIncomeType('edit');
+          }}
+        >
+          <Edit className="w-4 h-4" />
+        </Button>
+        <Button
+          size="icon"
+          variant="destructive"
+          onClick={(e) => {
+            e.stopPropagation();
+            setConfirmIncomeDialog({ open: true, incomeId:row.original._id });
+          }}
+        >
+          <Trash2 className="w-4 h-4" />
+        </Button>
+        <Button
+          size="icon"
+          variant="outline"
+          onClick={(e) => {
+            e.stopPropagation();
+            setEditIncome(row.original);
+            setShowIncomeModal(true);
+          }}
+        >
+          <Copy className="w-4 h-4" />
+        </Button>
+      </div>
+    ),
+  },
+   {
+    accessorKey: 'customId',
+    header: 'Income ID',
+  },
+  {
+    accessorKey: 'name',
+    header: 'Income ',
+    cell: info => info.getValue()?.toString().slice(0, 20) || '-', // truncate if long
+  },
+    {
+    accessorKey: 'amount',
+    header: 'Amount ',
+     cell: info => {
+      const amount = info.getValue();
+      return formatCurrency(amount) || 'N/A'; // ✅ Display task name instead of object
+    },
+  },
+
+    {
+    accessorKey: 'projectId',
+    header: 'Project',
+    cell: info => {
+      const project = info.getValue();
+      return project?.name || 'N/A'; // ✅ Display project name instead of object
+    },
+  },
+  {
+    accessorKey: 'phaseId',
+    header: 'Phase',
+    cell: info => {
+      const phase = info.getValue();
+      return phase?.name || 'N/A'; // ✅ Display phase name instead of object
+    },
+  },
+  
+  
+  {
+    accessorKey: 'paymentDate',
+    header: 'Payment Date',
+    cell: info => new Date(info.getValue() ).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    }),
+  },
+  {
+    accessorKey: 'paymentMethod',
+    header: 'Payment Method',
+    
+  },
+   {
+    accessorKey: 'transactionNo',
+    header: 'Reference No',
+    cell: info => info.getValue()?.toString().slice(0, 20) || '-', // truncate if long
+  },
+]
   const { id } = useParams();
   const navigate = useNavigate();
-  const { taskContext,setTaskContext,setPhaseContext,memberContext,expenseContext,setExpenseContext,projectContext,phaseContext } = useData();
+  const { taskContext,setTaskContext,setPhaseContext,memberContext,expenseContext,setExpenseContext,projectContext,phaseContext,incomeContext,setIncomeContext } = useData();
   const [phase,setPhase] = useState('');
   const [globalFilter, setGlobalFilter] = useState('');
   const [projectOptions,setProjectOptions]= useState([]);
@@ -278,7 +377,12 @@ const expenseColumns =[
   const [confirmDialog, setConfirmDialog] = useState({ open: false, phaseId: null });
   const [confirmExpenseDialog, setConfirmExpenseDialog] = useState({ open: false, expenseId: null });
   const [confirmTaskDialog, setConfirmTaskDialog] = useState({ open: false, incomeId: null });
-
+   const [confirmIncomeDialog, setConfirmIncomeDialog] = useState({ open: false, incomeId: null });
+//Income
+    const [incomes,setIncomes] = useState([]);
+    const [incomeType,setIncomeType]= useState('');
+     const [showIncomeModal, setShowIncomeModal] = useState(false);
+     const [editingIncome, setEditIncome] = useState(null);
   //EXPENSE
     const [expenses,setExpenses] = useState([]);
     const [expenseType,setExpenseType] = useState('');
@@ -304,11 +408,19 @@ const expenseColumns =[
      const expensePhase = expenseContext.filter(
         (expense) => String(expense.phaseId?._id) === String(updatedPhase?._id)
       );
+      const incomePhase = incomeContext.filter(
+        (income) => String(income?.phaseId?._id) === String(updatedPhase?._id)
+      );
       
       const totalExpense = expensePhase.reduce(
         (sum, expense) => sum + (expense?.amount || 0),
         0
       );
+      const totalIncome = incomePhase.reduce(
+        (sum, income) => sum + (income?.amount || 0),
+        0
+      );
+
    
       const totalBalance = updatedPhase?.budget-totalExpense;
       
@@ -322,7 +434,8 @@ const expenseColumns =[
         progress = Number(progress.toFixed(1));
     setPhase({
        ...updatedPhase,
-       
+       revenue:totalIncome,
+       revenueBalance:totalIncome-totalExpense,
        budgetBalance:totalBalance,
        expense:totalExpense,
        progress,
@@ -334,8 +447,9 @@ const expenseColumns =[
     setTasks(filteredTasks);
      setAllTasks(filteredTasks);
     setExpenses(expensePhase);
+    setIncomes(incomePhase);
      fetchOptions();
-  },[phaseContext,expenseContext,taskContext,memberContext,projectContext])
+  },[phaseContext,expenseContext,taskContext,memberContext,projectContext,incomeContext])
   
 
    const fetchOptions =() =>{
@@ -549,6 +663,12 @@ const handleform = (type , phase = null , project=null)=>{
         setSelectedPhase(phase);
         setShowExpenseModal(true);
   }
+  if (type === 'income') {
+        setEditExpense(null); // ✅ Clear old edit state
+        setSelectedProject(project); // Set selected project
+        setSelectedPhase(phase);
+        setShowIncomeModal(true);
+  }
 }
 
 /***************EXPENSE ****************/
@@ -564,8 +684,8 @@ const handleform = (type , phase = null , project=null)=>{
         phaseId:{_id:expenseData?.phaseId,name:phase?.label || ''},
     
       }
-      setExpenses(prev => [...prev, newExpense]);
-      setExpenseContext(prev=>[...prev,newExpense]);
+      setExpenses(prev => [newExpense,...prev ]);
+      setExpenseContext(prev=>[newExpense,...prev]);
     } catch (error) {
       console.error("Error adding Expense:", error);
     }
@@ -615,6 +735,72 @@ const handleform = (type , phase = null , project=null)=>{
     });
   }
 };
+
+/***************INCOME ****************/
+ const handleAddIncome = async (incomeData) => {
+   try {
+       const project = projectOptions.find(p=>p.value ===incomeData.projectId);
+        const phase = phaseOptions.find(ph=>ph.value===incomeData.phaseId);
+      const newIncome = {
+        ...incomeData,
+        projectId:{_id:incomeData?.projectId,name:project?.label || ''},
+         phaseId:{_id:incomeData?.phaseId,name:phase?.label || ''},
+    
+      }
+      setIncomes(prev => [newIncome,...prev]);
+      setIncomeContext(prev=>[newIncome,...prev]);
+    } catch (error) {
+       console.error("Error adding Income:", error);
+    }
+  };
+
+  const handleEditIncome = async(updated) => {
+     
+     const project = projectOptions.find(p=>p.value ===updated.projectId);
+     const phase = phaseOptions.find(ph=>ph.value===updated.phaseId);
+      const updatedIncome = {
+        ...updated,
+        projectId:{_id:updated?.projectId,name:project?.label || ''},
+       phaseId:{_id:updated?.phaseId,name:phase?.label || ''},
+        
+    
+      }
+
+     setIncomes(prev =>
+      prev.map((income) => income._id === updated._id ? updatedIncome : income)
+    );
+    
+    setIncomeContext(prev =>
+      prev.map((income) => income._id === updated._id ? updatedIncome : income)
+    );
+    setEditIncome(null);
+    setShowIncomeModal(false);
+  };
+
+  const handleDeleteIncome =async () => {
+      const id = confirmIncomeDialog.incomeId
+       setConfirmIncomeDialog({ open: false, incomeId: null })
+       try{
+    
+            await API.delete(`/income/${id}`);
+            setIncomes(incomes.filter(income =>income._id !== id));
+            setIncomeContext(incomeContext.filter(income =>income._id !== id));
+            setInfoDialog({
+                open: true,
+                type: "success",
+                message: "Income deleted successfully.",
+              });         
+        }
+        catch(err){
+            console.error(err);
+             setInfoDialog({
+              open: true,
+              type: "error",
+              message: "Failed to delete income.",
+            });
+            
+          }
+     }
   if (!phase) return <p className="p-6">Phase not found</p>;
 
   return (
@@ -721,30 +907,21 @@ const handleform = (type , phase = null , project=null)=>{
             </div>
             <Progress spent={phase?.expense} budget={phase?.budget} mode="budget" className="h-2" />
           </div>
-           {/* <div className="flex items-center gap-2 text-sm">
+           <div className="flex items-center gap-2 text-sm">
               <ReceiptIndianRupee className="w-4 h-4" />
-              <span>Client Payments: ₹{phase.revenue}</span>
+              <span>Client Payments: {formatCurrency(phase.revenue)}</span>
             </div>
             <div className="flex items-center gap-2 text-sm ">
               <ReceiptIndianRupee className="w-4 h-4" />
-              <span>Pending from Clients: ₹{phase.pending}</span>
-            </div> */}
-            {/* Return Progress */}
-          {/* <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span>Return Ratio</span>
-              <span>₹{phase.expense} / ₹{phase.revenue}</span>
+              <span>Client Payments Balance: {formatCurrency(phase.revenueBalance)}</span>
             </div>
-  
-              <Progress spent={phase?.expense} budget={phase?.revenue} mode="budget" className="h-2" />
-          </div> */}
-          {/* Assigned Members */}
+            
           <div>
         
           </div>
         </CardContent>
       </Card>
-      {/* {incomes.length>0?<div className="space-y-6 ">
+      {incomes.length>0?<div className="space-y-6 ">
           <div className=" flex items-center justify-between ">
             <h1 className="text-2xl font-bold">Related Incomes </h1>
             <Button onClick={() => handleform("income", phase, phase.projectId)}>
@@ -766,7 +943,7 @@ const handleform = (type , phase = null , project=null)=>{
     </Button>
   </Card>
   
-  } */}
+  }
   
       {expenses.length>0?<>
           <div className=" flex items-center justify-between">
@@ -879,6 +1056,7 @@ const handleform = (type , phase = null , project=null)=>{
                     <Badge key={m._id}  style={{ cursor: "pointer" }} onClick={()=>navigate(`/member/${m?._id}`)}>{m.name}</Badge>
               ))}</span>
                   </div>
+                  
                 
                 </div>
 
@@ -943,6 +1121,22 @@ const handleform = (type , phase = null , project=null)=>{
          editExpense={editingExpense}
          type={expenseType}
       />
+      <AddIncome
+              isOpen={showIncomeModal}
+              onClose={() => {
+                setShowIncomeModal(false);
+                setEditIncome(null);
+                  setSelectedProject(null);
+                  setSelectedPhase(null);
+                  setIncomeType('');
+              }}
+              selectedProject={selectedProject} // Pass selected project
+              selectedPhase={selectedPhase} // Pass selected phase
+              onSubmit={handleAddIncome}
+              onEdit={handleEditIncome}
+              editIncome={editingIncome}
+              type={incomeType}
+            />
       {/* Confirm Delete AlertDialog for Phase */}
                   <AlertDialog open={confirmDialog.open} onOpenChange={(open) => setConfirmDialog({ ...confirmDialog, open })}>
                     <AlertDialogContent>
@@ -996,6 +1190,25 @@ const handleform = (type , phase = null , project=null)=>{
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
+                       {/* Confirm Delete AlertDialog for Income */}
+                        <AlertDialog
+                              open={confirmIncomeDialog.open}
+                              onOpenChange={(open) => setConfirmIncomeDialog({ ...confirmIncomeDialog, open })}
+                            >
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    This action cannot be undone. Do you really want to delete this income?
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction onClick={handleDeleteIncome}>Yes, Delete</AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+      
 
                       {/* Info Dialog (Success / Error) */}
                   <Dialog open={infoDialog.open} onOpenChange={(open) => setInfoDialog({ ...infoDialog, open })}>

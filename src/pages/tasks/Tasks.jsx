@@ -103,6 +103,40 @@ export default function Tasks() {
     accessorKey: 'name',
     header: 'Task title',
   },
+  {
+    accessorKey: 'budget',
+    header: 'Budget ',
+     cell: info => {
+      const amount = info.getValue();
+      return formatCurrency(amount) || 'N/A'; 
+    },
+  },
+  {
+    accessorKey: 'projectId',
+    header: 'Project',
+     cell: info => {
+      const project = info.getValue();
+      return project?.name || 'N/A'; // ✅ Display project name instead of object
+    },
+  }, 
+  {
+    accessorKey: 'phaseId',
+    header: 'Phase',
+     cell: info => {
+      const phase = info.getValue();
+      return phase?.name || 'N/A'; // ✅ Display phase name instead of object
+    },
+  },
+    {
+    accessorKey: 'assignedTo',
+    header: 'Assigned To',
+    cell: info => {
+      const members = info.getValue();
+      return Array.isArray(members) && members.length > 0
+        ? members.map(m => m.name).join(', ')
+        : 'Unassigned'; // ✅ Display member names properly
+    },
+  },
   
   {
     accessorKey: 'startDate',

@@ -81,6 +81,15 @@ export default function Phases() {
       return project?.name || 'N/A'; // ✅ Display project name instead of object
     },
   }, 
+ 
+  {
+    accessorKey: 'budget',
+    header: 'Budget ',
+     cell: info => {
+      const amount = info.getValue();
+      return formatCurrency(amount) || 'N/A'; 
+    },
+  },
   
   {
     accessorKey: 'startDate',
@@ -189,6 +198,9 @@ export default function Phases() {
       const expensePhases = expenseContext.filter(
         (expense) => String(expense.phaseId?._id) === String(phase._id)
       );
+      const incomePhases = incomeContext.filter(
+        (income) => String(income.phaseId?._id) === String(phase._id)
+      );
   
       // const totalBudget = phaseTasks.reduce(
       //   (sum, task) => sum + (task?.budget || 0),
@@ -199,6 +211,10 @@ export default function Phases() {
         (sum, expense) => sum + (expense?.amount || 0),
         0
       );
+      const revenue = incomePhases.reduce(
+        (sum, income) => sum + (income?.amount || 0),
+        0
+      );
       const client = phaseProject?.[0]?.clientId?.name || 'N/A';
 
      
@@ -206,9 +222,9 @@ export default function Phases() {
         ...phase,
         // budget: totalBudget,
         spent,
-       
+       revenue,
         variance: phase?.budget - spent,
-       
+       revenueBalance:revenue-spent,
         progress,
         client,
       
@@ -219,7 +235,7 @@ export default function Phases() {
     setAllPhases(updatedPhases);
     fetchProject();
   }
-, [phaseContext, taskContext,expenseContext]);
+, [phaseContext, taskContext,expenseContext,incomeContext]);
 
       const handleAddPhase = async (phaseData) => {
     try {
@@ -607,6 +623,7 @@ const phaseFilterConfig = {
                     <span>Expenditure:</span>
                     <span className="font-medium text-foreground"> {formatCurrency(phase?.spent)} </span>
                   </div>
+                  
                  
                       {/* Budget Progress */}
                   <div className="space-y-2">
@@ -625,6 +642,28 @@ const phaseFilterConfig = {
                     <span>Budget Balance:</span>
                     <span className="font-medium text-foreground">{formatCurrency(phase?.variance)}</span>
                   </div>
+                  {
+                    phase.revenue>0&&<>
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                    <ReceiptIndianRupee className="w-4 h-4" />
+                
+                    <span>Client Payments:</span>
+                    <span className="font-medium text-foreground"> {formatCurrency(phase?.revenue)} </span>
+                  </div>
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <ReceiptIndianRupee className="w-4 h-4" />
+                
+                    <span>Client Payments Balance:</span>
+                    <span className="font-medium text-foreground"> {formatCurrency(phase?.revenueBalance)} </span>
+                  </div>
+                    </>
+
+                   
+                  }
+                 
+                    
+                   
+                  
                   
                 </div>
 

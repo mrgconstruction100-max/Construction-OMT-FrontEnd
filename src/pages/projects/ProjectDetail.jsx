@@ -105,7 +105,14 @@ export default function ProjectDetail() {
       return project?.name || 'N/A'; // ✅ Display project name instead of object
     },
   },
-  
+   {
+    accessorKey: 'phaseId',
+    header: 'Phase',
+    cell: info => {
+      const phase = info.getValue();
+      return phase?.name || 'N/A'; // ✅ Display phase name instead of object
+    },
+  },
   
   {
     accessorKey: 'paymentDate',
@@ -325,6 +332,7 @@ const expenseColumns =[
        expense:totalExpense,
        progress,
        revenue,
+       revenueBalance:revenue-totalExpense,
        pending,
        completedPhases,
        completedTasks,
@@ -922,6 +930,10 @@ const handleform = (type , phase = null , project=null)=>{
            <div className="flex items-center gap-2 text-sm">
               <ReceiptIndianRupee className="w-4 h-4" />
               <span>Client Payments: {formatCurrency(project?.revenue)}</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <ReceiptIndianRupee className="w-4 h-4" />
+              <span>Client Payments Balance: {formatCurrency(project?.revenueBalance)}</span>
             </div>
             <div className="flex items-center gap-2 text-sm ">
               <ReceiptIndianRupee className="w-4 h-4" />

@@ -8,16 +8,27 @@ import {
     flexRender,
 } from '@tanstack/react-table';
 import './DataTable.scss';
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
+import { Button } from '../ui/button';
+import { X } from 'lucide-react';
 
 function DataTable({ data, columns, globalFilter, onGlobalFilterChange, onRowClick }) {
+    const [columnVisibility, setColumnVisibility] = useState({});
+    const [columnOrder, setColumnOrder] = useState(columns.map(col => col.accessorKey || col.id));
+    const [dragOverIndex, setDragOverIndex] = useState(null);
+    const [showColumnPanel, setShowColumnPanel] = useState(false); // 🔹 Toggle state
+    const [pageSize, setPageSize] = useState('');
+    
     const table = useReactTable({
         data,
         columns,
+        // columnResizeMode: 'onChange',
         state: {
-            globalFilter,
+            globalFilter, columnVisibility, columnOrder
         },
         onGlobalFilterChange,
+        onColumnVisibilityChange: setColumnVisibility,
+        onColumnOrderChange: setColumnOrder,
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
@@ -26,9 +37,98 @@ function DataTable({ data, columns, globalFilter, onGlobalFilterChange, onRowCli
             pagination: { pageSize: 50 },
         },
     });
-    const [pageSize, setPageSize] = useState('');
+    const handleDragStart = (e, index) => {
+    e.dataTransfer.setData('colIndex', index);
+    e.currentTarget.classList.add('dragging');
+  };
+
+  const handleDragEnd = (e) => {
+    e.currentTarget.classList.remove('dragging');
+    setDragOverIndex(null);
+  };
+
+  const handleDrop = (e, index) => {
+    const draggedFrom = e.dataTransfer.getData('colIndex');
+    if (draggedFrom === '') return;
+    const newOrder = [...columnOrder];
+    const [moved] = newOrder.splice(draggedFrom, 1);
+    newOrder.splice(index, 0, moved);
+    setColumnOrder(newOrder);
+    setDragOverIndex(null);
+  };
+
+  const handleDragOver = (e, index) => {
+    e.preventDefault();
+    setDragOverIndex(index);
+  };
+
+  const handleDragLeave = () => {
+    setDragOverIndex(null);
+  };
+  // --- Reset columns to default order and visibility ---
+    const handleResetColumns = () => {
+        setColumnVisibility({});
+        setColumnOrder(columns.map(col => col.accessorKey || col.id));
+    };
+    
     return (
         <div className="data-table">
+        {/* Toggle Button */}
+                <div className='flex gap-4'>
+                <Button onClick={() => setShowColumnPanel(prev => !prev)} >
+                     {showColumnPanel ? 'Hide Columns' : 'Manage Columns'}
+                </Button>
+                <Button variant="secondary" onClick={handleResetColumns} >
+                      Reset Columns
+                </Button>
+                </div>
+                <div className={`column-toggle-panel ${showColumnPanel ? 'active' : ''}`}>
+                    <div className="panel-header">
+                            <h4>Manage Columns</h4>
+                            <button
+                        className="close-btn"
+                        onClick={() => setShowColumnPanel(false)}
+                        aria-label="Close column manager"
+                    >
+                        <X size={18} />
+                    </button>
+                    </div>
+                
+                <ul className="column-list">
+                    {columnOrder.map((colId, index) => {
+                    const column = table.getAllLeafColumns().find(c => c.id === colId);
+                    if (!column) return null;
+                    const isDragOver = dragOverIndex === index;
+
+                    return (
+                        <li
+                        key={colId}
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, index)}
+                        onDragEnd={handleDragEnd}
+                        onDrop={(e) => handleDrop(e, index)}
+                        onDragOver={(e) => handleDragOver(e, index)}
+                        onDragLeave={handleDragLeave}
+                        className={`draggable-column ${isDragOver ? 'drag-over' : ''}`}
+                        >
+                        <input
+                            type="checkbox"
+                            checked={column.getIsVisible()}
+                            onChange={column.getToggleVisibilityHandler()}
+                        />
+                        <span className="column-name">{column.columnDef.header}</span>
+                        <span className="drag-icon">☰</span>
+                        </li>
+                    );
+                    })}
+                </ul>
+                  {/* --- Reset Button --- */}
+                <div className="reset-section">
+                    <Button variant="secondary" onClick={handleResetColumns}>
+                        Reset Columns
+                    </Button>
+                </div>
+                </div>
             
             <div className="pagination">
                 <button 
@@ -76,7 +176,7 @@ function DataTable({ data, columns, globalFilter, onGlobalFilterChange, onRowCli
             </div>
  
 
-            <div className="table-wrapper overflow-x-auto" >
+            <div className="table-wrapper " >
                 <table >
                     <colgroup>
                         {/* ✅ Define column widths for fixed layout */}
@@ -90,6 +190,7 @@ function DataTable({ data, columns, globalFilter, onGlobalFilterChange, onRowCli
                                 {headerGroup.headers.map(header => (
                                     <th 
                                         key={header.id} 
+                                        // style={{ width: header.getSize(), position: 'relative' }}
                                         onClick={header.column.getToggleSortingHandler()} 
                                         className={header.column.getCanSort() ? "sortable" : ""}
                                     >
@@ -103,6 +204,31 @@ function DataTable({ data, columns, globalFilter, onGlobalFilterChange, onRowCli
                                                  header.column.getCanSort() ? '↕️' : ''}
                                             </span>
                                         </div>
+                                        {/* {header.column.getCanResize() && (
+                                        <div
+                                            onMouseDown={(e) => {
+                                            e.stopPropagation();
+                                            e.preventDefault();
+                                            header.getResizeHandler()(e);
+                                            }}
+                                            onClick={(e) => e.stopPropagation()}
+                                            onTouchStart={(e) => {
+                                            e.stopPropagation();
+                                            header.getResizeHandler()(e);
+                                            }}
+                                            className="resizer"
+                                            style={{
+                                            right: 0,
+                                            top: 0,
+                                            bottom: 0,
+                                            width: '15px',
+                                            position: 'absolute',
+                                            cursor: 'col-resize',
+                                            userSelect: 'none',
+                                            touchAction: 'none',
+                                            zIndex: 10,
+                                            }}
+                                            />)} */}
                                     </th>
                                 ))}
                             </tr>
@@ -117,6 +243,7 @@ function DataTable({ data, columns, globalFilter, onGlobalFilterChange, onRowCli
                                 className={onRowClick ? "cursor-pointer hover:bg-gray-50" : ""}
                             >
                                 {row.getVisibleCells().map(cell => (
+                                    // <td key={cell.id}  style={{ width: cell.column.getSize() }}>
                                     <td key={cell.id}>
                                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                     </td>
@@ -181,3 +308,4 @@ function DataTable({ data, columns, globalFilter, onGlobalFilterChange, onRowCli
 }
 
 export default DataTable;
+

@@ -42,7 +42,7 @@ export default function IncomeDetail() {
     
     setIncome( updatedIncome);
     fetchOptions();
-  },[incomeContext])
+  },[incomeContext,projectContext,phaseContext])
   
   const fetchOptions =() =>{
       setProjectOptions(projectContext.map(project=>({
@@ -159,10 +159,14 @@ export default function IncomeDetail() {
                
              <p>Description: {income?.description}</p>
             </div>}
-            {/* <div className="flex items-center gap-2 ">
+           {
+            income.phaseId&&<>
+            <div className="flex items-center gap-2 ">
                 <Layers className="w-4 h-4"/>
-         <p style={{ cursor: "pointer" }} onClick={()=>navigate(`/phase/${income.phaseId?._id}`)}>Phase Name: {income?.phaseId?.name}</p>
-            </div> */}
+                <p style={{ cursor: "pointer" }} onClick={()=>navigate(`/phase/${income.phaseId?._id}`)}>Phase Name: {income?.phaseId?.name}</p>
+            </div>
+            </>
+           } 
           <div className="flex items-center gap-2 ">
              <Building2 className="w-4 h-4"/>
           <p style={{ cursor: "pointer" }} onClick={()=>navigate(`/project/${income?.projectId?._id}`)}>Project Name: {income?.projectId?.name}</p>
@@ -176,6 +180,15 @@ export default function IncomeDetail() {
               <Calendar className="w-4 h-4" /> 
               <span>Payment Date: {formatDate(income?.paymentDate)} </span>
             </div>
+            {
+              income?.transactionNo&&<>
+              <div className="flex items-center gap-2 ">
+              <ReceiptText className="w-4 h-4" /> 
+              <span>Reference: {income?.transactionNo} </span>
+            </div>
+              </>
+            }
+            
           
 
         

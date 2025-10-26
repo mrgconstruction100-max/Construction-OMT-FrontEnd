@@ -1,27 +1,154 @@
 
-.data-table {
-  padding: 1rem;
-  width: 100%;
 
-  .table-header {
-    margin-bottom: 1rem;
+/* Column List & Draggable */
+.column-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
 
-    input {
-      width: 100%;
-      padding: 8px 12px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 14px;
-      background: #fff;
-      color: #000;
+.draggable-column {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  margin-bottom: 6px;
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  cursor: grab;
+  transition: all 0.2s ease;
+  position: relative;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
 
-      &:focus {
-        border-color: var(--accent-primary);
+.draggable-column:hover {
+  background: #f0f4ff;
+  border-color: #c3d0ff;
+}
+
+.draggable-column.dragging {
+  opacity: 0.6;
+  cursor: grabbing;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.draggable-column.drag-over {
+  border: 2px dashed #007bff;
+  background: #e6f0ff;
+}
+
+.drag-icon {
+  margin-left: auto;
+  font-size: 14px;
+  color: #9ca3af;
+}
+
+.column-name {
+  font-weight: 500;
+  color: #333;
+}
+
+/* --- Manage Columns Panel Enhancements --- */
+.column-toggle-panel {
+  .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+
+    h4 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin: 0;
+      color: #111827;
+    }
+
+    .close-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: #555;
+      padding: 4px;
+      border-radius: 4px;
+      transition: background 0.2s ease;
+
+      &:hover {
+        background: #e5e7eb;
+      }
+
+      svg {
+        vertical-align: middle;
       }
     }
   }
- 
 
+  .reset-section {
+    margin-top: 16px;
+    text-align: center;
+
+    button {
+      background-color: #e5e7eb;
+      color: #111;
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background-color: #d1d5db;
+      }
+    }
+  }
+}
+
+/* --- Fixed Column Toggle Panel --- */
+.column-toggle-panel {
+  position: fixed; /* ✅ stays attached to the viewport */
+  top: 80px; /* adjust based on your header height */
+  right: -320px; /* hidden offscreen initially */
+  width: 300px;
+  height: calc(100% - 100px); /* leaves room for header/footer if any */
+  background: #f9fafb;
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+  border-left: 1px solid #ddd;
+  padding: 16px;
+  transition: right 0.3s ease;
+  z-index: 1001; /* ensure it’s above the table */
+  overflow-y: auto;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+
+  &.active {
+    right: 0; /* ✅ slides in smoothly */
+  }
+}
+.toggle-column-panel-btn {
+ // position: fixed;
+  //  top: 10px;
+ //  right: 20px;
+  background-color: #4f46e5;
+  color: white;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  //z-index: 1000;
+
+  &:hover {
+    background-color: #4338ca;
+  }
+}
+.data-table {
+  padding: 1rem;
+  width: 100%;
+}
+  
   .table-wrapper {
     // ✅ CRITICAL: Constrain the container first
     width: 100%;
@@ -36,8 +163,9 @@
     -webkit-overflow-scrolling: touch;
     
     // ✅ Custom scrollbar styling
-    scrollbar-width: thin;
+    
     scrollbar-color: #ccc transparent;
+   
     
     &::-webkit-scrollbar {
       height: 8px;
@@ -63,15 +191,13 @@
   }
 
   table {
-    // ✅ KEY FIX: Use table-layout fixed to control column behavior
+   
    width: 120%;
-  // /  width: max-content; 
+ 
     border-collapse: collapse;
     table-layout: fixed; // ✅ This prevents columns from expanding beyond table width
     
-    // ✅ Alternative: If you need auto layout, DON'T set min-width
-    // table-layout: auto;
-    // min-width: 100%; // Use this instead of max-content
+   
      @media (max-width: 768px) {
         width: 300%;
       }
@@ -214,42 +340,34 @@
     }
   }
  
+/* --- Dual Scrollbar Styling --- */
+.table-scrollbar-top {
+  overflow-x: auto;
+  overflow-y: hidden;
+  height: 12px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  background: #f8f9fa; /* ✅ Light background so it's visible */
+  scrollbar-width: thin;
+  scrollbar-color: #ccc transparent;
+
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: #999;
+  }
 }
 
-.table-container {
-  position: relative;
-}
-
-.side-arrow {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: #555;
-  font-size: 24px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  user-select: none;
-}
-
-.table-container:hover .side-arrow {
-  opacity: 0.3;
-}
-
-.side-arrow:hover {
-  opacity: 1;
-}
-
-.side-arrow.left {
-  left: 0;
-  background: linear-gradient(to right, rgba(255,255,255,0.8), transparent);
-}
-
-.side-arrow.right {
-  right: 0;
-  background: linear-gradient(to left, rgba(255,255,255,0.8), transparent);
+/* make the width of the top scroll match the bottom table width */
+.table-scrollbar-top .scroll-content {
+  height: 1px; /* ✅ Just enough to trigger scrollbar */
+  // width: 120%; /* match your table width */
 }
