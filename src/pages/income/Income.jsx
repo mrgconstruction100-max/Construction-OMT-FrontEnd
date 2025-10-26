@@ -29,15 +29,8 @@ import AddIncome from '@/components/models/AddIncome';
 import FilterComp from '../../components/filter/FilterComp';
 import FilterStatus from '../../components/filter/FilterStatus';
 import { StatsCard } from "@/components/dashboard/StatsCard";
-import ReportDownloader from '../../components/Report/ReportDownloader';
-const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount)
-  }
+// import ReportDownloader from '../../components/Report/ReportDownloader';
+
 function Income() {
   const incomeColumns =[
    {
@@ -459,7 +452,7 @@ const paymentTotals = allIncomes.reduce((acc, income) => {
                  
          
               </div>
-              <ReportDownloader data={incomes}
+              {/* <ReportDownloader data={incomes}
                             title={`Income Report`}
                             columns={[
                                 { header: "Income Id", key: "customId" },
@@ -472,7 +465,7 @@ const paymentTotals = allIncomes.reduce((acc, income) => {
                                 { header: "Payment Method", key: "paymentMethod" },
                                 { header: "Reference", key: "reference" },
                                
-                            ]} />
+                            ]} /> */}
           <DataTable data={incomes} columns={incomeColumns} globalFilter={globalFilter}
             onGlobalFilterChange={setGlobalFilter} onRowClick={handleRowClick}/>
         </div>
