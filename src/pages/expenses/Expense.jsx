@@ -28,6 +28,7 @@ import AddExpense from '@/components/models/AddExpense';
 import FilterComp from '../../components/filter/FilterComp';
 import FilterStatus from '../../components/filter/FilterStatus';
 import { StatsCard } from "@/components/dashboard/StatsCard";
+import ReportDownloader from '../../components/Report/ReportDownloader';
 function Expense() {
   const expenseColumns =[
    {
@@ -470,6 +471,28 @@ const paymentTotals = allExpenses.reduce((acc, expense) => {
                                    />
                                   
                  </div>
+                   <ReportDownloader data={expenses}
+                                             title={`Expense Report`}
+                                             columns={[
+                                                 { header: "Expense Id", key: "customId" },
+                                                 { header: "Expense Title", key: "name" },
+                                                 { header: "Description", key: "description" },
+                                                 { header: "Project Name", key: "projectId.name" },
+                                                 { header: "Phase Name", key: "phaseId.name" },
+                                                 { header: "Payment Date", key: "paymentDate",type: "date"},
+                                                 { header: "Amount", key: "amount"},
+                                                 { header: "Paid To", key: "paidTo" },
+                                                 { header: "Payment Method", key: "paymentMethod" },
+                                                 { header: "Reference", key: "transactionNo" },
+                                                 { header: "Category", key: "category" },
+                                                 { header: "Workers", key: "workers" },
+                                                 { header: "Salary", key: "salary" },
+                                                 { header: "Food", key: "food" },
+                                                 { header: "Unit", key: "unit" },
+                                                 { header: "Quantity", key: "quantity" },
+                                                 { header: "Price", key: "price" },
+                                                 { header: "Miscellaneous", key: "miscellaneous" },         
+                                             ]} />
           <DataTable data={expenses} columns={expenseColumns} globalFilter={globalFilter}
             onGlobalFilterChange={setGlobalFilter} onRowClick={handleRowClick}/>
         </div>
