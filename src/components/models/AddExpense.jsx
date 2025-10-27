@@ -88,6 +88,39 @@ function AddExpense({ isOpen, onClose, onSubmit, editExpense, onEdit,selectedPro
               // Update total amount in formData
               setFormData(prev => ({ ...prev, amount: total }));
             }, [formData.category,formData.salary,formData.food,formData.miscellaneous,formData.quantity,formData.price,]);
+            
+            useEffect(() => {
+                    // Reset category-specific fields when category changes
+                    if (formData.category === "Labour") {
+                      // Clear Materials fields
+                      setFormData(prev => ({
+                        ...prev,
+                        quantity: '',
+                        price: '',
+                        unit: '',
+                      }));
+                    } else if (formData.category === "Materials") {
+                      // Clear Labour fields
+                      setFormData(prev => ({
+                        ...prev,
+                        workers: '',
+                        salary: '',
+                        food: '',
+                      }));
+                    } else {
+                      // For other categories (Travel, Miscellaneous, etc.), clear all category-specific fields
+                      setFormData(prev => ({
+                        ...prev,
+                        workers: '',
+                        salary: '',
+                        food: '',
+                        quantity: '',
+                        price: '',
+                        unit: '',
+                        miscellaneous: '',
+                      }));
+                    }
+                  }, [formData.category]); // Only trigger when category changes
 
    useEffect(() => {
     if (!editExpense && !selectedProject) return;
