@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Dashboard from './pages/dashboard/Dashboard';
 import Projects from './pages/projects/Project';
@@ -27,13 +27,12 @@ import ClientDetail from './pages/clients/ClientDetail';
 import MemberDetail from './pages/members/MemberDetail';
 import ProfileSettings from './pages/Settings/ProfileSettings';
 import RecentActivityDetailPage from './components/dashboard/RecentActivityDetailedPage';
-
-
-
-
+import InstallPopup from './components/ui/InstallPopup';
 
 function App() {
   return (
+    <>
+   
   <Router>
       <Routes>
           <Route path="/login" element={<LoginForm />} />
@@ -67,7 +66,9 @@ function App() {
           </Route>
       </Routes>
     </Router>
-     
+      {/* install prompt popup (renders when browser signals installable) */}
+      <InstallPopup />
+      </>
   )
 }
 
