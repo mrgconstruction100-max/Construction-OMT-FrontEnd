@@ -11,7 +11,7 @@ import { useData } from '../../context/DataContext';
 
 function AddTasks({ isOpen, onClose, onSubmit, editTask, onEdit,selectedProject,selectedPhase }) {
     const [formData,setFormData]=useState({
-        typeId:"",
+      
         name:"",
         description:"",
         startDate:null,
@@ -89,7 +89,7 @@ function AddTasks({ isOpen, onClose, onSubmit, editTask, onEdit,selectedProject,
             endDate: editTask.endDate ? new Date(editTask.endDate) : null,});
         } else {
           setFormData({
-            typeId:"",
+           
             name:"",
             description:"",
             startDate:null,
@@ -155,7 +155,7 @@ function AddTasks({ isOpen, onClose, onSubmit, editTask, onEdit,selectedProject,
                     
        
                 setFormData({
-                        typeId:"",
+                       
                         name:"",
                         description:"",
                         startDate:null,
@@ -176,7 +176,7 @@ function AddTasks({ isOpen, onClose, onSubmit, editTask, onEdit,selectedProject,
         };
         const handleCancel = () => {
             setFormData({
-              typeId:"",
+              
               name:"",
               description:"",
               startDate:null,
@@ -227,15 +227,7 @@ function AddTasks({ isOpen, onClose, onSubmit, editTask, onEdit,selectedProject,
                                         error={errors.name}
                                         icon={<CheckSquare size={16} />}
                                         />
-                                        <FormInput
-                                        label="Task Id"
-                                        value={formData.typeId}
-                                        onChange={(value) => setFormData({ ...formData, typeId: value })}
-                                        placeholder="Enter task name"
-                                        icon={<TagIcon size={16} />}
-                                        />
                                        
-
                                         <FormInput
                                         label="Description"
                                         value={formData.description}

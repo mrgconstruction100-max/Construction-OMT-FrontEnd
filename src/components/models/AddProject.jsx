@@ -16,7 +16,6 @@ function AddProject({ isOpen, onClose, onSubmit, editProject, onEdit }) {
         location:"",
         startDate:null,
         endDate:null,
-        typeId:"",
         status:"",
         clientId:"",
         projectManager:""
@@ -65,7 +64,6 @@ function AddProject({ isOpen, onClose, onSubmit, editProject, onEdit }) {
             location:"",
             startDate:null,
             endDate:null,
-            typeId:"",
             status:"",
             clientId:"",
             projectManager:""
@@ -123,7 +121,6 @@ function AddProject({ isOpen, onClose, onSubmit, editProject, onEdit }) {
                         location:"",
                         startDate:null,
                         endDate:null,
-                        typeId:"",
                         status:"",
                         clientId:"",
                         projectManager:""
@@ -142,7 +139,6 @@ function AddProject({ isOpen, onClose, onSubmit, editProject, onEdit }) {
             location:"",
             startDate:null,
             endDate:null,
-            typeId:"",
             status:"",
             clientId:"",
             projectManager:""
@@ -173,14 +169,7 @@ function AddProject({ isOpen, onClose, onSubmit, editProject, onEdit }) {
                                         error={errors.name}
                                         icon={<FolderOpen size={16} />}
                                         />
-                                        <FormInput
-                                        label="Project Id"
-                                        value={formData.typeId}
-                                        onChange={(value) => setFormData({ ...formData, typeId: value })}
-                                        placeholder="Enter project id"
-                                        icon={<TagIcon size={16} />}
-                                        />
-                                       
+                                   
 
                                         <FormInput
                                         label="Description"
